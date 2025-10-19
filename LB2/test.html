@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktiver Test: Brettspiel-Mechaniken</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .quiz-container, .start-screen, .results-screen, #badge-section {
+            display: none; /* Initially hide all sections */
+        }
+        .answer-option {
+            transition: background-color 0.3s, border-color 0.3s, transform 0.2s;
+        }
+        .answer-option:hover {
+            background-color: #f0fdfa; /* teal-50 */
+            border-color: #2dd4bf; /* teal-400 */
+            transform: translateY(-2px);
+        }
+        .correct {
+            background-color: #dcfce7 !important; /* green-100 */
+            border-color: #22c55e !important; /* green-500 */
+        }
+        .incorrect {
+            background-color: #fee2e2 !important; /* red-100 */
+            border-color: #ef4444 !important; /* red-500 */
+        }
+        .disabled {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        
+        /* Badge Styles */
+        #badge {
+            background: linear-gradient(135deg, #047857, #0d9488);
+            border: 8px solid #facc15;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3), inset 0 0 15px rgba(255,255,255,0.2);
+        }
+        #badge-seal {
+            background-color: #facc15;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+        }
+        #badge-seal::before {
+            content: '';
+            position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            border: 2px dashed #ca8a04;
+            border-radius: 50%;
+        }
+
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #badge-section, #badge-section * {
+                visibility: visible;
+            }
+            #badge-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+            }
+            #badge {
+                transform: scale(1.2);
+                 -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-3xl mx-auto bg-white rounded-xl shadow-2xl p-6 sm:p-10 text-slate-800">
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="text-center" style="display: block;">
+            <h1 class="text-3xl font-bold text-slate-800 mb-2">Test: Brettspiel-Mechaniken</h1>
+            <p class="text-slate-500 mb-6">Teste dein Wissen über die Bausteine von Brettspielen!</p>
+            <div class="bg-teal-50 border-l-4 border-teal-500 text-teal-800 p-4 rounded-r-lg mb-8 text-left">
+                <p>Es werden dir <strong>10 zufällige Fragen</strong> aus einem größeren Pool gestellt.</p>
+                <p>Um zu bestehen, musst du mindestens <strong>80% (8 von 10)</strong> der Fragen richtig beantworten.</p>
+            </div>
+            <button id="start-btn" class="w-full bg-teal-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-700 transition-transform transform hover:scale-105">Test starten</button>
+        </div>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="quiz-container">
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <p class="text-sm font-semibold text-slate-500">Frage <span id="question-number"></span> von 10</p>
+                    <p class="text-sm font-semibold text-slate-500">Score: <span id="score">0</span></p>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-teal-600 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+            <h2 id="question" class="text-2xl font-bold mb-6">Frage wird geladen...</h2>
+            <div id="answer-options" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Answer options will be inserted here -->
+            </div>
+             <div id="feedback-container" class="mt-4 p-4 rounded-lg text-center hidden"></div>
+             <button id="next-btn" class="hidden mt-6 w-full bg-teal-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-700 transition-transform transform hover:scale-105">Weiter</button>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="results-screen text-center">
+            <h2 id="result-title" class="text-3xl font-bold mb-4">Ergebnis</h2>
+            <p id="result-text" class="text-lg text-slate-600 mb-6">Du hast <span id="final-score"></span> von 10 Fragen richtig beantwortet.</p>
+            <div id="result-feedback" class="p-4 rounded-lg mb-8"></div>
+            <button id="retry-btn" class="w-full bg-teal-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-700 transition-transform transform hover:scale-105">Erneut versuchen</button>
+        </div>
+        
+        <!-- Badge Section (hidden by default) -->
+        <div id="badge-section" class="text-center">
+             <div id="badge" class="w-full max-w-lg mx-auto p-8 text-white rounded-2xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-full bg-black opacity-10"></div>
+                <div class="relative z-10">
+                    <h2 class="text-xl font-bold uppercase tracking-widest text-yellow-300">Zertifikat</h2>
+                    <p class="text-lg mt-2">verliehen an</p>
+                    <input id="badge-name" type="text" placeholder="[ Dein Name ]" class="w-4/5 bg-transparent border-b-2 border-yellow-300 text-3xl font-serif text-center text-yellow-200 my-4 focus:outline-none placeholder-yellow-200 placeholder-opacity-50">
+                    <p class="text-lg">für das erfolgreiche Bestehen des Tests</p>
+                    <h3 class="text-2xl font-bold text-yellow-300 mt-2 mb-6">"Brettspiel-Mechaniken"</h3>
+                    <div id="badge-seal" class="w-24 h-24 rounded-full mx-auto flex items-center justify-center relative">
+                        <svg class="w-16 h-16 text-yellow-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                    </div>
+                </div>
+            </div>
+            <button id="print-badge-btn" class="mt-8 w-full sm:w-auto bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 transition-transform transform hover:scale-105">Abzeichen drucken / speichern</button>
+        </div>
+
+
+    </div>
+
+    <script>
+        const allQuestions = [
+            // Merkmale von Spielen
+            { question: "Ein Spiel hat eine 50-seitige Anleitung, viele strategische Optionen und eine Spieldauer von über 3 Stunden. Wie ist seine Komplexität einzuschätzen?", answerOptions: [ { text: "Sehr niedrig, für Anfänger geeignet.", correct: false, rationale: "Eine lange Anleitung und Spieldauer sind klare Anzeichen für hohe, nicht niedrige Komplexität." }, { text: "Mittel, für Familien geeignet.", correct: false, rationale: "Solche Merkmale deuten eher auf ein Experten- als auf ein Familienspiel hin." }, { text: "Sehr hoch, für erfahrene Spieler.", correct: true }, { text: "Die Komplexität hängt nur vom Thema ab.", correct: false, rationale: "Das Thema kann die Komplexität beeinflussen, aber Regeln und Spieldauer sind die entscheidenden Faktoren." } ] },
+            { question: "Ein Spiel wird als 'schnelles, lustiges Kartenspiel für Partys' beworben, mit einfachen Regeln und viel Interaktion. Wer ist hier die primäre Zielgruppe?", answerOptions: [ { text: "Strategen, die langfristig planen wollen.", correct: false, rationale: "'Schnell' und 'lustig' deutet nicht auf ein tiefes Strategiespiel hin." }, { text: "Gelegenheitsspieler und soziale Gruppen.", correct: true }, { text: "Kinder im Vorschulalter.", correct: false, rationale: "Partyspiele sind oft für Jugendliche und Erwachsene, nicht zwingend für Vorschulkinder." }, { text: "Einzelspieler.", correct: false, rationale: "Ein 'Partyspiel' schließt Einzelspieler als Zielgruppe aus." } ] },
+            { question: "Die grundlegende Handlung eines Spiels ist es, als Entdecker eine neue Insel zu erforschen, Schätze zu finden und als Erster das 'Herz der Insel' zu erreichen. Was wird hier beschrieben?", answerOptions: [ { text: "Die Spielmechanik", correct: false, rationale: "Die Mechanik beschreibt die Regeln (z.B. 'würfle und ziehe'). Dies ist die übergeordnete Idee." }, { text: "Die Zielgruppe", correct: false, rationale: "Die Zielgruppe sind die Spieler, nicht die Handlung." }, { text: "Die Spielidee und das Spielziel", correct: true }, { text: "Die Komplexität", correct: false, rationale: "Die Idee sagt noch nichts darüber aus, wie komplex die Regeln sind." } ] },
+
+            // Spieltypische Elemente
+            { question: "Bei 'Siedler von Catan' erhält der Spieler mit mindestens drei Ritterkarten die Sonderkarte 'Größte Rittermacht', die 2 Siegpunkte wert ist. Dies ist ein klares Beispiel für ein...", answerOptions: [ { text: "Levelsystem", correct: false, rationale: "Ein Levelsystem hätte mehrere aufsteigende Stufen, hier gibt es nur einen Titel." }, { text: "Feedback-System", correct: false, rationale: "Feedback ist eine direkte Reaktion auf eine Aktion. Dies ist eine dauerhafte Auszeichnung." }, { text: "Abzeichen oder einen Erfolg.", correct: true }, { text: "Eine Mission", correct: false, rationale: "Eine Mission wäre z.B. 'Spiele 3 Ritterkarten aus'. Die Sonderkarte ist die Belohnung für den Erfolg, die meisten zu haben." } ] },
+            { question: "Wenn ein Spieler bei 'Zug um Zug' eine Strecke baut, darf er sofort neue Waggon-Karten ziehen. Diese Karten sind in diesem Moment eine...", answerOptions: [ { text: "Mission.", correct: false, rationale: "Eine Mission wäre z.B. 'Baue eine Strecke'. Die Karten sind die Folge daraus." }, { text: "Belohnung.", correct: true }, { text: "Strafe.", correct: false, rationale: "Neue Karten zu erhalten ist positiv, also keine Strafe." }, { text: "Rangliste.", correct: false, rationale: "Eine Rangliste vergleicht Spieler, sie ist keine direkte Folge einer Aktion." } ] },
+            { question: "Bei dem kooperativen Spiel 'Die Crew' erhalten die Spieler zu Beginn jeder Runde spezifische Aufträge, die sie erfüllen müssen (z.B. 'Gewinne den letzten Stich mit der blauen 1'). Diese Aufträge sind...", answerOptions: [ { text: "Erfolge.", correct: false, rationale: "Ein Erfolg ist eine besondere Leistung. Hier ist es die Kernaufgabe der Runde." }, { text: "Level.", correct: false, rationale: "Die Runden bauen aufeinander auf, aber der einzelne Auftrag ist eine Mission." }, { text: "Missionen.", correct: true }, { text: "Feedback.", correct: false, rationale: "Das Erfüllen der Mission führt zu Feedback (Erfolg/Misserfolg), ist aber nicht das Feedback selbst." } ] },
+            { question: "Ein Mitspieler schlägt bei 'Mensch ärgere dich nicht' eine Figur. Sie wird vom Feld genommen und zurück zum Start geschickt. Dies ist ein Beispiel für...?", answerOptions: [ { text: "eine Belohnung.", correct: false, rationale: "Es ist eine Belohnung für den einen, aber für den anderen eine Strafe. Der Überbegriff 'Feedback' ist passender." }, { text: "eine Mission.", correct: false, rationale: "Eine Mission ist ein Auftrag, kein direktes Ergebnis einer Aktion." }, { text: "Zufall.", correct: false, rationale: "Ob man schlagen kann, hängt vom Zufall ab, aber die Konsequenz selbst ist eine feste Regel." }, { text: "klares, direktes Feedback.", correct: true } ] },
+            { question: "In einer Kampagne steigt man vom 'Anfänger' zum 'Fortgeschrittenen' und dann zum 'Experten' auf. Dies ist ein Beispiel für ein...", answerOptions: [ { text: "Punktesystem", correct: false, rationale: "Punkte können zum Aufstieg führen, aber das System der aufsteigenden Titel ist ein Levelsystem." }, { text: "Levelsystem.", correct: true }, { text: "Feedback-System", correct: false, rationale: "Der Aufstieg ist zwar positives Feedback, aber das Gesamtsystem hat einen spezifischeren Namen." }, { text: "Abzeichen", correct: false, rationale: "Ein Abzeichen wäre eine einzelne Auszeichnung, nicht eine Reihe von aufsteigenden Stufen." } ] },
+
+            // Spielmechaniken
+            { question: "Bei 'Carcassonne' ziehen Spieler verdeckte Plättchen und legen sie passend an die bereits ausliegende Landschaft an. Wie nennt man diese Kernmechanik?", answerOptions: [ { text: "Deckbuilding", correct: false, rationale: "Falsch. Beim 'Deckbuilding' geht es um das Verbessern eines Kartenstapels, nicht um das Anlegen von Plättchen." }, { text: "Tile-Placement", correct: true }, { text: "Area Control", correct: false, rationale: "Obwohl man Gebiete besetzt, ist die zentrale Handlung das Legen der Plättchen." }, { text: "Set-Collection", correct: false, rationale: "Falsch. Man sammelt zwar Punkte, aber nicht durch das Sammeln von Sets im klassischen Sinne." } ] },
+            { question: "Im Spiel 'Dominion' starten alle Spieler mit einem schwachen Kartendeck und kaufen im Spielverlauf stärkere Karten hinzu, um ihr Deck zu verbessern. Dies ist das Paradebeispiel für die Mechanik ...", answerOptions: [ { text: "Hand-Management", correct: false, rationale: "Das Ausspielen der Karten ist Teil des Spiels, aber die übergeordnete Mechanik ist die Verbesserung des Decks." }, { text: "Deckbuilding", correct: true }, { text: "Set-Collection", correct: false, rationale: "Obwohl man Karten sammelt, ist das Ziel nicht, Sets zu bilden, sondern die Gesamtqualität des Decks zu steigern." }, { text: "Worker-Placement", correct: false, rationale: "Diese Mechanik hat nichts mit dem Aufbau eines Kartendecks zu tun." } ] },
+            { question: "Bei 'Phase 10' oder 'Rummy' müssen Spieler Kartenkombinationen wie 'zwei Drillinge' oder 'eine Siebener-Folge' sammeln. Wie nennt man diese Mechanik?", answerOptions: [ { text: "Deckbuilding", correct: false, rationale: "Falsch. Beim Deckbuilding wird der eigene Kartenstapel im Spielverlauf verbessert." }, { text: "Worker-Placement", correct: false, rationale: "Diese Mechanik beinhaltet das Einsetzen von Figuren auf Aktionsfelder." }, { text: "Hand-Management", correct: false, rationale: "Hand-Management ist zwar Teil des Spiels, aber das Bilden von Gruppen (Sets) ist der Kern." }, { text: "Set-Collection", correct: true } ] },
+            { question: "In einem Brettspiel setzen Spieler reihum ihre Arbeiterfiguren auf Aktionsfelder (z.B. 'Holz sammeln'). Sobald ein Feld besetzt ist, ist es für andere blockiert. Um welche Kernmechanik handelt es sich?", answerOptions: [ { text: "Deckbuilding", correct: false, rationale: "Falsch. Hier geht es um das Einsetzen von Figuren, nicht um den Aufbau eines Kartendecks." }, { text: "Tile-Placement", correct: false, rationale: "Nicht ganz. Bei 'Tile-Placement' werden Plättchen gelegt, um eine Landschaft zu gestalten." }, { text: "Worker-Placement", correct: true }, { text: "Set-Collection", correct: false, rationale: "Falsch. 'Set-Collection' beschreibt das Sammeln von zusammengehörigen Sets." } ] },
+
+            // Spielerlebnis
+            { question: "Du ziehst bei 'Zug um Zug' genau die letzte Zielkarte, die du für den Sieg brauchst und die perfekt zu deinen gebauten Strecken passt. Welches Spielerlebnis steht hier im Vordergrund?", answerOptions: [ { text: "Frustration", correct: false, rationale: "Frustration wäre das Gefühl, wenn man die falsche Karte zieht." }, { text: "Glück und Spannung", correct: true }, { text: "Empathie", correct: false, rationale: "Empathie (Mitgefühl) würdest du vielleicht für deine Gegner empfinden, aber nicht durch den eigenen Glücksmoment." }, { text: "Langeweile", correct: false, rationale: "Dieser Moment ist das genaue Gegenteil von langweilig." } ] },
+            { question: "Ein Mitspieler überlegt bei 'Schach' zehn Minuten lang für seinen nächsten Zug, während du untätig warten musst. Welches Gefühl kann hier leicht entstehen?", answerOptions: [ { text: "Spannung", correct: false, rationale: "Anfangs vielleicht, aber nach langer Wartezeit schlägt es oft in etwas Negatives um." }, { text: "Frustration oder Ungeduld", correct: true }, { text: "Glück", correct: false, rationale: "Glück hat mit Zufall zu tun. Das lange Nachdenken des Gegners ist eine bewusste Handlung." }, { text: "Teamarbeit", correct: false, rationale: "Bei Schach spielt man gegeneinander, nicht im Team." } ] },
+            { question: "Im kooperativen Spiel 'Hanabi' siehst du, dass ein Mitspieler im Begriff ist, eine wichtige Karte abzuwerfen. Du kannst aber nichts sagen und musst mitfiebern. Welches Gefühl beschreibt dies am besten?", answerOptions: [ { text: "Schadenfreude", correct: false, rationale: "Schadenfreude empfindet man, wenn einem Gegner etwas Schlechtes passiert. Hier ist es dein Teamkollege." }, { text: "Spannung und Empathie", correct: true }, { text: "Stolz", correct: false, rationale: "Stolz wärst du nach einer gelungenen Aktion, nicht während der angespannten Wartezeit." }, { text: "Resilienz", correct: false, rationale: "Resilienz ist der Umgang mit einem Rückschlag, der bereits passiert ist." } ] },
+            
+            // Persönliche Entwicklung
+            { question: "Ein Spieler verliert bei 'Catan' durch Würfelpech, gibt aber nicht auf und sucht neue Handelsstrategien. Welche persönliche Fähigkeit zeigt er hier am stärksten?", answerOptions: [ { text: "Kreativität", correct: false, rationale: "Kreativität ist Teil der Lösung, aber der Umgang mit dem Rückschlag selbst hat einen anderen Namen." }, { text: "Empathie", correct: false, rationale: "Empathie (Mitgefühl) bezieht sich auf andere Spieler, nicht auf den Umgang mit eigenem Pech." }, { text: "Resilienz", correct: true }, { text: "Kommunikation", correct: false, rationale: "Kommunikation ist wichtig für den Handel, aber die innere Stärke weiterzumachen, ist hier entscheidend." } ] },
+            { question: "Bei 'Schach' plant ein Spieler nicht nur seinen nächsten Zug, sondern überlegt auch, wie der Gegner darauf reagieren könnte und was seine eigenen Züge in fünf Runden bewirken. Diese Fähigkeit ist...", answerOptions: [ { text: "Problemlösungsfähigkeit.", correct: false, rationale: "Problemlösung ist die Reaktion auf eine akute Situation. Das hier ist langfristiger." }, { text: "Strategisches Denken.", correct: true }, { text: "Resilienz.", correct: false, rationale: "Resilienz ist der Umgang mit Rückschlägen, nicht die Planung im Voraus." }, { text: "Kreativität.", correct: false, rationale: "Kreativität kann Teil der Strategie sein, aber der Überbegriff für langfristige Planung ist Strategie." } ] },
+            { question: "In einem 'Escape Room'-Brettspiel steht die Gruppe vor einem Rätsel, für das es keine offensichtliche Lösung gibt. Ein Spieler schlägt vor, zwei Gegenstände auf eine unkonventionelle Weise zu kombinieren, was die Lösung bringt. Welche Fähigkeit war hier entscheidend?", answerOptions: [ { text: "Strategisches Denken", correct: false, rationale: "Strategie ist langfristige Planung. Hier geht es um eine plötzliche, neue Idee." }, { text: "Kommunikation", correct: false, rationale: "Kommunikation ist wichtig, um die Idee zu teilen, aber die Idee selbst entsteht durch Kreativität." }, { text: "Kreativität / Laterales Denken", correct: true }, { text: "Resilienz", correct: false, rationale: "Resilienz wäre gefragt, wenn die Gruppe an dem Rätsel fast verzweifelt wäre." } ] },
+            { question: "Dein Plan bei 'Zug um Zug' wird durchkreuzt, weil ein Mitspieler eine wichtige Strecke vor dir blockiert. Du musst nun schnell umdenken und eine neue Route finden. Welche Fähigkeit wird hier gefordert?", answerOptions: [ { text: "Wertebildung", correct: false, rationale: "Hier geht es um eine kognitive Fähigkeit, nicht um moralische Werte." }, { text: "Problemlösungsfähigkeit", correct: true }, { text: "Empathie", correct: false, rationale: "In diesem Moment bist du wahrscheinlich eher auf die Lösung deines Problems als auf die Gefühle des Gegners fokussiert." }, { text: "Teamarbeit", correct: false, rationale: "Da der Gegner dich blockiert hat, ist dies keine Situation der Teamarbeit." } ] },
+
+            // Soziale Entwicklung
+            { question: "Bei 'Werwölfe vom Düsterwald' müssen die Dorfbewohner miteinander reden, argumentieren und überzeugen, um die Werwölfe zu finden. Welche soziale Fähigkeit ist hier absolut entscheidend für den Sieg?", answerOptions: [ { text: "Strategisches Denken", correct: false, rationale: "Strategie ist wichtig, aber ohne die Fähigkeit, andere zu überzeugen, nützt sie nichts." }, { text: "Resilienz", correct: false, rationale: "Resilienz ist wichtig, wenn man fälschlicherweise beschuldigt wird, aber die Kernkompetenz ist eine andere." }, { text: "Kommunikation und Argumentation", correct: true }, { text: "Kreativität", correct: false, rationale: "Kreative Lügen können helfen, aber die grundlegende Fähigkeit ist die Kommunikation." } ] },
+            { question: "Im Spiel 'Pandemic' gewinnt oder verliert die gesamte Gruppe gemeinsam. Die Spieler müssen ihre Züge abstimmen und sich gegenseitig helfen. Was wird hier am stärksten gefördert?", answerOptions: [ { text: "Wettbewerbsdenken", correct: false, rationale: "Das Spiel ist das Gegenteil von Wettbewerb unter den Spielern." }, { text: "Teamarbeit", correct: true }, { text: "Frustrationstoleranz", correct: false, rationale: "Diese wird zwar auch gefördert, aber das Hauptmerkmal des Spiels ist die Teamarbeit." }, { text: "Kreativität", correct: false, rationale: "Kreativität kann helfen, aber der Kern des Spiels ist die Zusammenarbeit." } ] },
+            { question: "Ein Spiel wie 'Die Crew' erfordert, dass alle Spieler die (sehr begrenzten) Hinweise der anderen genau beachten und ihre eigenen Züge zum Wohl der Gruppe planen. Dies fördert vor allem die...", answerOptions: [ { text: "soziale Inklusion und Aufmerksamkeit.", correct: true }, { text: "Fähigkeit zu bluffen.", correct: false, rationale: "In diesem Spiel ist Ehrlichkeit entscheidend, nicht Bluffen." }, { text: "direkte Konfrontation.", correct: false, rationale: "Das Spiel ist kooperativ, es gibt keine Konfrontation." }, { text: "individuelle Siegstrategie.", correct: false, rationale: "Eine individuelle Strategie führt hier zur Niederlage des Teams." } ] },
+            { question: "Ein Spiel belohnt faires Handeln und bestraft Spieler, die ihre Versprechen brechen, durch einen schlechten Ruf, sodass niemand mehr mit ihnen handeln will. Was wird hier spielerisch vermittelt?", answerOptions: [ { text: "Strategisches Denken", correct: false, rationale: "Das ist zwar Teil des Spiels, aber die Lektion über faires Verhalten ist ein Wert." }, { text: "Eine Spielmechanik", correct: false, rationale: "Das Reputationssystem ist die Mechanik, aber das, was es vermittelt, ist ein Wert." }, { text: "Wertebildung (z.B. Fairness, Vertrauen)", correct: true }, { text: "Komplexität", correct: false, rationale: "Dies beschreibt den Inhalt, nicht die Schwierigkeit des Spiels." } ] }
+        ];
+
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const startScreen = document.getElementById('start-screen');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsScreen = document.getElementById('results-screen');
+        const badgeSection = document.getElementById('badge-section');
+        const startBtn = document.getElementById('start-btn');
+        const retryBtn = document.getElementById('retry-btn');
+        const printBadgeBtn = document.getElementById('print-badge-btn');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const nextBtn = document.getElementById('next-btn');
+
+        startBtn.addEventListener('click', startQuiz);
+        retryBtn.addEventListener('click', startQuiz);
+        printBadgeBtn.addEventListener('click', () => window.print());
+        nextBtn.addEventListener('click', () => {
+             currentQuestionIndex++;
+             showQuestion();
+        });
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startQuiz() {
+            shuffleArray(allQuestions);
+            questions = allQuestions.slice(0, 10);
+            currentQuestionIndex = 0;
+            score = 0;
+            
+            startScreen.style.display = 'none';
+            resultsScreen.style.display = 'none';
+            badgeSection.style.display = 'none';
+            quizContainer.style.display = 'block';
+            
+            updateScoreDisplay();
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                showResults();
+                return;
+            }
+            
+            nextBtn.classList.add('hidden');
+            feedbackContainer.classList.add('hidden');
+
+            const questionData = questions[currentQuestionIndex];
+            document.getElementById('question').textContent = questionData.question;
+            document.getElementById('question-number').textContent = currentQuestionIndex + 1;
+            
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = `${((currentQuestionIndex) / questions.length) * 100}%`;
+
+            const answerOptionsContainer = document.getElementById('answer-options');
+            answerOptionsContainer.innerHTML = '';
+            answerOptionsContainer.classList.remove('disabled');
+
+            
+            questionData.answerOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option.text;
+                button.classList.add('answer-option', 'w-full', 'p-4', 'border-2', 'rounded-lg', 'text-left', 'font-semibold');
+                button.onclick = () => selectAnswer(button, option);
+                answerOptionsContainer.appendChild(button);
+            });
+        }
+
+        function selectAnswer(button, option) {
+            document.getElementById('answer-options').classList.add('disabled');
+            
+            if (option.correct) {
+                score++;
+                button.classList.add('correct');
+                updateScoreDisplay();
+                // If correct, move to next question after a short delay
+                 setTimeout(() => {
+                    currentQuestionIndex++;
+                    showQuestion();
+                }, 1200);
+
+            } else {
+                button.classList.add('incorrect');
+                feedbackContainer.textContent = option.rationale;
+                feedbackContainer.className = 'mt-4 p-4 rounded-lg text-center bg-red-100 text-red-800 font-semibold';
+                feedbackContainer.classList.remove('hidden');
+                nextBtn.classList.remove('hidden'); // Show next button only on incorrect answer
+            }
+
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+        }
+        
+        function updateScoreDisplay() {
+            document.getElementById('score').textContent = score;
+        }
+
+        function showResults() {
+            quizContainer.style.display = 'none';
+            document.getElementById('final-score').textContent = score;
+            const percentage = (score / questions.length) * 100;
+            const passed = percentage >= 80;
+
+            const resultFeedback = document.getElementById('result-feedback');
+            const resultTitle = document.getElementById('result-title');
+            
+            if (passed) {
+                resultTitle.textContent = "Herzlichen Glückwunsch!";
+                resultFeedback.className = 'p-4 rounded-lg mb-8 bg-green-100 text-green-800 border-l-4 border-green-500';
+                resultFeedback.innerHTML = `<p class="font-bold">Test bestanden!</p><p>Du hast ${percentage}% der Fragen richtig beantwortet. Super gemacht!</p>`;
+                resultsScreen.style.display = 'none';
+                badgeSection.style.display = 'block';
+            } else {
+                resultTitle.textContent = "Leider nicht bestanden";
+                resultFeedback.className = 'p-4 rounded-lg mb-8 bg-red-100 text-red-800 border-l-4 border-red-500';
+                resultFeedback.innerHTML = `<p class="font-bold">Versuch es noch einmal!</p><p>Du hast ${percentage}% erreicht. Zum Bestehen sind 80% notwendig. Du schaffst das!</p>`;
+                resultsScreen.style.display = 'block';
+                retryBtn.style.display = 'block';
+            }
+        }
+    </script>
+
+</body>
+</html>
+
