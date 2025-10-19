@@ -115,6 +115,38 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                background-color: white;
+                font-size: 12pt;
+                -webkit-print-color-adjust: exact; /* Ensures colors and backgrounds are printed in Chrome/Safari */
+                color-adjust: exact;
+            }
+            header, footer, button {
+                display: none !important;
+            }
+            .form-section {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                padding: 1rem !important;
+                margin-bottom: 1rem !important;
+                break-inside: avoid; /* Prevents sections from splitting across pages */
+            }
+            .form-input, .form-textarea {
+                border: 1px solid #aaa !important;
+                background-color: #fff !important;
+            }
+            .max-w-4xl {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .tooltip, .tooltip-icon {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body class="p-4 sm:p-8">
@@ -324,9 +356,12 @@
             </div>
 
             <!-- Submit Button -->
-            <div class="text-center mt-10">
-                 <button type="button" onclick="window.print()" class="bg-teal-600 text-white font-bold py-4 px-10 rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-300 transition duration-300 transform hover:scale-105">
+            <div class="text-center mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                 <button type="button" onclick="window.print()" class="w-full sm:w-auto bg-teal-600 text-white font-bold py-4 px-10 rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-300 transition duration-300 transform hover:scale-105">
                     Antworten drucken / Als PDF speichern
+                </button>
+                <button type="button" onclick="printEmptyForm()" class="w-full sm:w-auto bg-slate-200 text-slate-700 font-bold py-4 px-10 rounded-lg hover:bg-slate-300 focus:outline-none focus:ring-4 focus:ring-slate-300 transition duration-300 transform hover:scale-105">
+                    Leeren Fragebogen drucken
                 </button>
             </div>
         </form>
@@ -335,6 +370,19 @@
             <p>&copy; 2025 - Erstellt für den Unterricht</p>
         </footer>
     </div>
+
+    <script>
+        function printEmptyForm() {
+            // Get the form element
+            const form = document.getElementById('gameAnalysisForm');
+            // Reset all form fields to their default values
+            form.reset();
+            // Allow a brief moment for the reset to render, then print
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        }
+    </script>
 </body>
 </html>
 
