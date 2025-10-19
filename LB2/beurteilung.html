@@ -135,18 +135,19 @@
         }
 
         @media print {
-            /* --- Druckoptimierungen --- */
+            /* --- Extrem kompakte Druckoptimierungen --- */
             body {
                 background-color: #fff;
                 padding: 0;
                 margin: 0;
-                font-size: 9pt; /* Kleinere Basisschriftgröße */
+                font-size: 8.5pt; /* Sehr kleine Basisschriftgröße */
+                line-height: 1.2;
             }
             .container {
                 box-shadow: none;
                 border: none;
                 margin: 0;
-                padding: 5px; /* Weniger Innenabstand */
+                padding: 0; /* Kein Innenabstand */
                 width: 100%;
                 max-width: 100%;
                 border-radius: 0;
@@ -161,35 +162,44 @@
                 resize: none;
                 -webkit-print-color-adjust: exact;
                 color-adjust: exact;
+                padding: 2px !important;
             }
             h1, h2, h3 {
                 page-break-after: avoid;
-                margin-top: 10px; /* Kompaktere Abstände */
-                padding-bottom: 5px;
+                margin-top: 8px; /* Stark reduzierte Abstände */
+                margin-bottom: 2px;
+                padding-bottom: 2px;
             }
-            h1 { font-size: 16pt; }
-            h3 { font-size: 11pt; }
+            h1 { font-size: 14pt; }
+            h3 { font-size: 10pt; }
 
             table {
-                margin-top: 10px;
+                margin-top: 5px;
             }
             th, td {
-                padding: 4px; /* Kompakterer Zellenabstand */
+                padding: 3px; /* Stark reduzierter Zellenabstand */
+            }
+            .criteria-description {
+                font-size: 0.9em;
+                line-height: 1.1;
             }
             .summary-table td {
-                padding: 6px;
+                padding: 4px;
+            }
+            .student-info {
+                margin-bottom: 10px;
             }
             textarea {
-                height: 60px !important; /* Kleinere Höhe für Feedbackfelder */
+                height: 40px !important; /* Sehr kleine Höhe für Feedbackfelder */
             }
             .feedback-section {
-                margin-top: 15px;
+                margin-top: 10px;
             }
             .signature-section {
-                margin-top: 20px;
+                margin-top: 15px;
             }
             .signature-line {
-                margin-top: 20px; /* Geringerer Abstand für Unterschrift */
+                margin-top: 15px; /* Geringerer Abstand für Unterschrift */
             }
             table, .feedback-section {
                 page-break-inside: avoid; /* Seitenumbrüche in Tabellen verhindern */
