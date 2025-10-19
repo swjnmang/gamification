@@ -1,2 +1,2 @@
-# gamificaton-
+# gamification
 Modul Gamification DHWS
