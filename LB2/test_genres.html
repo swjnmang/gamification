@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pixel-Probe - Interaktiver Genre-Test</title>
+    <!-- jsPDF Library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -17,7 +19,7 @@
             align-items: center;
             min-height: 100vh;
         }
-        #quiz-container {
+        .container {
             max-width: 700px;
             width: 100%;
             padding: 30px;
@@ -48,13 +50,30 @@
             border-radius: 5px;
             transition: width 0.5s ease-in-out;
         }
-        #question-view {
+        #start-view, #question-view, #final-view {
             text-align: center;
         }
         h2 {
             font-size: 1.5em;
             margin-bottom: 20px;
             color: #333;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
         }
         #game-title {
             font-size: 2em;
@@ -101,38 +120,52 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin: 5px;
         }
-        #check-btn {
+        #start-btn, #check-btn {
             background-color: #005A9C;
         }
-        #check-btn:hover {
+        #start-btn:hover, #check-btn:hover {
             background-color: #004170;
         }
-        #next-btn {
+        #next-btn, #download-btn, #restart-btn {
             background-color: #E67E22;
         }
-        #next-btn:hover {
+        #next-btn:hover, #download-btn:hover, #restart-btn:hover {
             background-color: #d35400;
-        }
-        #final-view {
-            text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <div id="quiz-container">
-        <div class="header">
-            <h1>Pixel-Probe Genre-Test</h1>
-            <div id="progress-bar-container">
-                <div id="progress-bar"></div>
+    <div id="quiz-container" class="container">
+        
+        <div id="start-view">
+            <h1>Willkommen zum Pixel-Probe Genre-Test</h1>
+            <p style="margin: 20px 0;">Bitte gib deinen Namen und deine Klasse ein, um zu starten.</p>
+            <div class="input-group">
+                <label for="student-name">Dein Name:</label>
+                <input type="text" id="student-name" placeholder="Max Mustermann">
+            </div>
+            <div class="input-group">
+                <label for="student-class">Deine Klasse:</label>
+                <input type="text" id="student-class" placeholder="Klasse 8b">
+            </div>
+            <div class="button-container">
+                <button id="start-btn" onclick="startQuiz()">Test starten</button>
             </div>
         </div>
 
-        <div id="question-view">
-            <h2 id="question-counter">Frage 1 von 13</h2>
+        <div id="question-view" style="display: none;">
+            <div class="header">
+                <h1>Pixel-Probe Genre-Test</h1>
+                <div id="progress-bar-container">
+                    <div id="progress-bar"></div>
+                </div>
+            </div>
+            <h2 id="question-counter"></h2>
             <p>Welches Haupt-Genre hat das Spiel:</p>
-            <h3 id="game-title">Elden Ring</h3>
+            <h3 id="game-title"></h3>
             <select id="genre-select">
                 <option value="">-- Bitte wählen --</option>
                 <option value="action">Action</option>
@@ -160,13 +193,18 @@
             <p style="font-size: 1.2em;">Dein Ergebnis:</p>
             <p id="final-score" style="font-size: 2.5em; font-weight: bold; color: #005A9C;"></p>
             <p id="final-feedback"></p>
-            <button id="restart-btn" onclick="location.reload()">Test neu starten</button>
+            <div class="button-container">
+                <button id="download-btn" onclick="downloadBadge()">Badge als PDF herunterladen</button>
+                <button id="restart-btn" onclick="location.reload()">Test neu starten</button>
+            </div>
         </div>
 
     </div>
 
     <script>
-        const questions = [
+        const { jsPDF } = window.jspdf;
+
+        const allQuestions = [
             { game: "Elden Ring", correct: "rpg", explanation: "Nicht ganz. Obwohl es viel Action und eine riesige offene Welt gibt, ist Elden Ring im Kern ein Rollenspiel (RPG). Das Aufleveln, Sammeln von Ausrüstung und Entwickeln von Fähigkeiten sind die zentralen Elemente." },
             { game: "Baldur's Gate 3", correct: "rpg", explanation: "Falsch. Baldur's Gate 3 ist ein klassisches Rollenspiel (RPG). Rundenbasierte Kämpfe, eine tiefe Story und komplexe Charakterentwicklung sind hier entscheidend." },
             { game: "Call of Duty", correct: "shooter", explanation: "Das ist nicht korrekt. Das zentrale Spielelement bei Call of Duty ist der Kampf mit Schusswaffen aus der Ego-Perspektive. Das ist die Definition eines Shooters." },
@@ -179,11 +217,25 @@
             { game: "Hades", correct: "action", explanation: "Das ist nicht ganz richtig. 'Indie-Game' ist eine Kategorie, die die Herkunft (unabhängiges Studio) beschreibt, aber kein Spielgenre. Vom Gameplay her ist Hades mit seinen schnellen Kämpfen klar dem Action-Genre zuzuordnen." },
             { game: "Cyberpunk 2077", correct: "rpg", explanation: "Obwohl es intensive Shooter-Elemente hat, ist das Kern-Gameplay von Cyberpunk 2077 ein Rollenspiel (RPG). Die Story-Entscheidungen, Dialoge und Charakter-Skill-Systeme sind hier dominant." },
             { game: "Life is Strange", correct: "adventure", explanation: "Nicht korrekt. In diesem Spiel stehen die Geschichte, die Erkundung der Umgebung und das Lösen kleiner Rätsel durch Dialoge im Vordergrund. Das ist typisch für ein Adventure." },
-            { game: "EndeavorRx", correct: "serious", explanation: "Falsch. EndeavorRx ist ein Spiel, das zu medizinischen Zwecken (Behandlung von ADHS) entwickelt wurde. Spiele, deren Hauptzweck nicht die Unterhaltung ist, nennt man Serious Games." }
+            { game: "EndeavorRx", correct: "serious", explanation: "Falsch. EndeavorRx ist ein Spiel, das zu medizinischen Zwecken (Behandlung von ADHS) entwickelt wurde. Spiele, deren Hauptzweck nicht die Unterhaltung ist, nennt man Serious Games." },
+            { game: "The Legend of Zelda: Tears of the Kingdom", correct: "action", explanation: "Auch wenn es eine riesige offene Welt und RPG-Elemente hat, ist das Kern-Gameplay, das aus Erkunden, Kämpfen und Rätseln besteht, typisch für ein Action-Adventure. Wir fassen es hier unter Action zusammen." },
+            { game: "Fortnite", correct: "shooter", explanation: "Das ist nicht korrekt. Obwohl Bauen ein großes Element ist, ist das Hauptziel das Eliminieren von Gegnern mit Schusswaffen. Das macht es zu einem Shooter (speziell Battle Royale)." },
+            { game: "League of Legends", correct: "strategie", explanation: "Falsch. Dieses Spiel gehört zum MOBA-Genre (Multiplayer Online Battle Arena), was eine Unterkategorie der Strategiespiele ist. Team-Taktik und strategische Entscheidungen sind entscheidend." },
+            { game: "Among Us", correct: "indie", explanation: "Das ist nicht die beste Antwort. Das Genre heißt 'Social Deduction', aber da dies keine Option ist, passt 'Indie-Game' am besten, da es von einem kleinen, unabhängigen Team entwickelt wurde und einen einzigartigen Spielstil hat." },
+            { game: "Animal Crossing: New Horizons", correct: "simulation", explanation: "Nicht ganz. Animal Crossing ist eine Lebenssimulation. Es gibt keine festen Ziele, stattdessen gestaltest du dein eigenes Leben auf einer Insel." },
+            { game: "God of War Ragnarök", correct: "action", explanation: "Obwohl die Story episch ist (wie in einem Adventure), stehen die schnellen, brutalen Kämpfe im Mittelpunkt, was es zu einem Action-Spiel macht." },
+            { game: "The Sims 4", correct: "simulation", explanation: "Falsch. 'Die Sims' ist die bekannteste Lebenssimulation. Du steuerst das Leben von virtuellen Menschen, baust Häuser und verfolgst Karrieren." },
+            { game: "Diablo IV", correct: "rpg", explanation: "Nicht ganz. Diablo ist ein klassisches Action-Rollenspiel (ARPG). Das Sammeln von Beute (Loot) und das Verbessern des Charakters durch Kämpfe sind die Kernelemente eines RPGs." },
+            { game: "Rocket League", correct: "sport", explanation: "Falsche Antwort. Auch wenn es eine fiktive Sportart ist, ahmt es die Regeln und den Wettbewerbscharakter von echtem Sport nach. Daher ist es ein Sportspiel." },
+            { game: "Stardew Valley", correct: "simulation", explanation: "Nicht ganz. Stardew Valley ist eine Farming-Simulation mit RPG-Elementen. Da der Hauptfokus auf dem Aufbau und der Verwaltung einer Farm liegt, ist Simulation die beste Antwort." }
         ];
 
+        let quizQuestions = [];
+        const numberOfQuestionsToAsk = 10;
         let currentQuestionIndex = 0;
         let score = 0;
+        let studentName = "";
+        let studentClass = "";
 
         const questionCounter = document.getElementById('question-counter');
         const gameTitle = document.getElementById('game-title');
@@ -193,9 +245,34 @@
         const nextBtn = document.getElementById('next-btn');
         const progressBar = document.getElementById('progress-bar');
         
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startQuiz() {
+            studentName = document.getElementById('student-name').value;
+            studentClass = document.getElementById('student-class').value;
+            
+            if (!studentName || !studentClass) {
+                alert("Bitte fülle beide Felder aus, um den Test zu starten.");
+                return;
+            }
+
+            const shuffled = [...allQuestions];
+            shuffleArray(shuffled);
+            quizQuestions = shuffled.slice(0, numberOfQuestionsToAsk);
+
+            document.getElementById('start-view').style.display = 'none';
+            document.getElementById('question-view').style.display = 'block';
+            loadQuestion();
+        }
+
         function loadQuestion() {
-            const question = questions[currentQuestionIndex];
-            questionCounter.textContent = `Frage ${currentQuestionIndex + 1} von ${questions.length}`;
+            const question = quizQuestions[currentQuestionIndex];
+            questionCounter.textContent = `Frage ${currentQuestionIndex + 1} von ${quizQuestions.length}`;
             gameTitle.textContent = question.game;
             genreSelect.value = "";
             genreSelect.disabled = false;
@@ -207,14 +284,14 @@
 
         function checkAnswer() {
             const selectedAnswer = genreSelect.value;
-            const correctAnswer = questions[currentQuestionIndex].correct;
-            const explanation = questions[currentQuestionIndex].explanation;
-
             if (!selectedAnswer) {
                 alert("Bitte wähle ein Genre aus!");
                 return;
             }
 
+            const correctAnswer = quizQuestions[currentQuestionIndex].correct;
+            const explanation = quizQuestions[currentQuestionIndex].explanation;
+            
             feedbackDiv.style.display = 'block';
             genreSelect.disabled = true;
             checkBtn.style.display = 'none';
@@ -232,7 +309,7 @@
 
         function nextQuestion() {
             currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
+            if (currentQuestionIndex < quizQuestions.length) {
                 loadQuestion();
             } else {
                 showFinalResults();
@@ -246,10 +323,10 @@
             
             const finalScoreEl = document.getElementById('final-score');
             const finalFeedbackEl = document.getElementById('final-feedback');
-            finalScoreEl.textContent = `${score} / ${questions.length}`;
+            finalScoreEl.textContent = `${score} / ${quizQuestions.length}`;
 
             let feedbackText = '';
-            const percentage = (score / questions.length) * 100;
+            const percentage = (score / quizQuestions.length) * 100;
             if (percentage === 100) {
                 feedbackText = "Fantastisch! Du bist ein wahrer Genre-Meister!";
             } else if (percentage >= 75) {
@@ -260,17 +337,69 @@
                 feedbackText = "Das ist ein guter Anfang. Wiederhole den Test, um dein Wissen zu festigen!";
             }
             finalFeedbackEl.textContent = feedbackText;
-            updateProgressBar();
+            
+            // Final progress bar update to 100%
+            progressBar.style.width = '100%';
         }
         
         function updateProgressBar() {
-            const progress = (currentQuestionIndex / questions.length) * 100;
+            const progress = (currentQuestionIndex / quizQuestions.length) * 100;
             progressBar.style.width = `${progress}%`;
         }
 
-        // Initial load
-        window.onload = loadQuestion;
+        function downloadBadge() {
+            const doc = new jsPDF();
+            const page_width = doc.internal.pageSize.getWidth();
+            const today = new Date();
+            const date_string = today.toLocaleDateString('de-DE');
+
+            // Header
+            doc.setFillColor('#005A9C'); // Pixel-Probe Blau
+            doc.rect(0, 0, page_width, 25, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(22);
+            doc.setTextColor('#FFFFFF');
+            doc.text("PIXEL-PROBE ZERTIFIKAT", page_width / 2, 16, { align: 'center' });
+
+            // Main Content
+            doc.setTextColor('#333333');
+            doc.setFontSize(18);
+            doc.setFont('helvetica', 'normal');
+            doc.text("Genre-Experten Abzeichen", page_width / 2, 50, { align: 'center' });
+
+            doc.setFontSize(12);
+            doc.text("Dieses Zertifikat wird verliehen an:", page_width / 2, 70, { align: 'center' });
+            
+            doc.setFontSize(26);
+            doc.setFont('helvetica', 'bold');
+            doc.text(studentName, page_width / 2, 85, { align: 'center' });
+            
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`(Klasse: ${studentClass})`, page_width / 2, 95, { align: 'center' });
+
+            doc.setFontSize(12);
+            doc.text(`für das erfolgreiche Absolvieren des Genre-Tests am ${date_string} mit`, page_width / 2, 120, { align: 'center' });
+
+            doc.setFontSize(22);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`${score} von ${quizQuestions.length} Punkten`, page_width / 2, 132, { align: 'center' });
+
+            // Simple Badge Icon
+            doc.setFillColor("#E67E22"); // Orange
+            doc.circle(page_width / 2, 170, 20, 'F');
+            doc.setFillColor("#FFFFFF"); // White star
+            doc.setFontSize(50);
+            doc.text("*", page_width / 2, 179, { align: 'center' });
+
+            // Footer
+            doc.setFillColor('#E67E22'); // Pixel-Probe Orange
+            doc.rect(0, doc.internal.pageSize.getHeight() - 10, page_width, 10, 'F');
+
+            doc.save(`Pixel-Probe-Badge-${studentName.replace(/\s/g, '_')}.pdf`);
+        }
     </script>
 </body>
 </html>
+
 
