@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel-Probe - Interaktiver Genre-Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #quiz-container {
+            max-width: 700px;
+            width: 100%;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-top: 5px solid #005A9C; /* Pixel-Probe Blau */
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #005A9C;
+            margin: 0;
+            font-size: 1.8em;
+        }
+        #progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        #progress-bar {
+            width: 0%;
+            height: 8px;
+            background-color: #E67E22; /* Pixel-Probe Orange */
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+        #question-view {
+            text-align: center;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        #game-title {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #005A9C;
+        }
+        select {
+            font-size: 1.1em;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+            max-width: 350px;
+            margin: 0 auto;
+            display: block;
+        }
+        #feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 1.1em;
+            display: none; /* Hidden by default */
+        }
+        #feedback.correct {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        #feedback.incorrect {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        .button-container {
+            margin-top: 25px;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #check-btn {
+            background-color: #005A9C;
+        }
+        #check-btn:hover {
+            background-color: #004170;
+        }
+        #next-btn {
+            background-color: #E67E22;
+        }
+        #next-btn:hover {
+            background-color: #d35400;
+        }
+        #final-view {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="quiz-container">
+        <div class="header">
+            <h1>Pixel-Probe Genre-Test</h1>
+            <div id="progress-bar-container">
+                <div id="progress-bar"></div>
+            </div>
+        </div>
+
+        <div id="question-view">
+            <h2 id="question-counter">Frage 1 von 13</h2>
+            <p>Welches Haupt-Genre hat das Spiel:</p>
+            <h3 id="game-title">Elden Ring</h3>
+            <select id="genre-select">
+                <option value="">-- Bitte wählen --</option>
+                <option value="action">Action</option>
+                <option value="shooter">Shooter</option>
+                <option value="adventure">Adventure</option>
+                <option value="beatemup">Beat 'em ups</option>
+                <option value="jump">Jump 'n' Run</option>
+                <option value="openworld">Open World</option>
+                <option value="rpg">Rollenspiele/RPG</option>
+                <option value="simulation">Simulationen</option>
+                <option value="strategie">Aufbau- & Strategiespiele</option>
+                <option value="sport">Sportspiele</option>
+                <option value="indie">Indie-Games</option>
+                <option value="serious">Serious Games</option>
+            </select>
+            <div id="feedback"></div>
+            <div class="button-container">
+                <button id="check-btn" onclick="checkAnswer()">Antwort prüfen</button>
+                <button id="next-btn" onclick="nextQuestion()" style="display: none;">Nächste Frage</button>
+            </div>
+        </div>
+
+        <div id="final-view" style="display: none;">
+            <h2>Test abgeschlossen!</h2>
+            <p style="font-size: 1.2em;">Dein Ergebnis:</p>
+            <p id="final-score" style="font-size: 2.5em; font-weight: bold; color: #005A9C;"></p>
+            <p id="final-feedback"></p>
+            <button id="restart-btn" onclick="location.reload()">Test neu starten</button>
+        </div>
+
+    </div>
+
+    <script>
+        const questions = [
+            { game: "Elden Ring", correct: "rpg", explanation: "Nicht ganz. Obwohl es viel Action und eine riesige offene Welt gibt, ist Elden Ring im Kern ein Rollenspiel (RPG). Das Aufleveln, Sammeln von Ausrüstung und Entwickeln von Fähigkeiten sind die zentralen Elemente." },
+            { game: "Baldur's Gate 3", correct: "rpg", explanation: "Falsch. Baldur's Gate 3 ist ein klassisches Rollenspiel (RPG). Rundenbasierte Kämpfe, eine tiefe Story und komplexe Charakterentwicklung sind hier entscheidend." },
+            { game: "Call of Duty", correct: "shooter", explanation: "Das ist nicht korrekt. Das zentrale Spielelement bei Call of Duty ist der Kampf mit Schusswaffen aus der Ego-Perspektive. Das ist die Definition eines Shooters." },
+            { game: "EA Sports FC", correct: "sport", explanation: "Falsche Antwort. Dieses Spiel simuliert eine echte Sportart (Fußball) so realistisch wie möglich und gehört damit klar zu den Sportspielen." },
+            { game: "Super Mario Bros. Wonder", correct: "jump", explanation: "Das stimmt nicht. Bei Mario-Spielen geht es hauptsächlich darum, durch geschicktes Springen und Laufen durch Level zu kommen. Das nennt man Jump 'n' Run." },
+            { game: "Minecraft", correct: "openworld", explanation: "Nicht ganz treffend. Das Hauptmerkmal von Minecraft ist die riesige, frei erkundbare Welt ohne festgelegte Ziele, in der man bauen und entdecken kann. Das ist ein typisches Open-World- (oder Sandbox-) Spiel." },
+            { game: "Street Fighter 6", correct: "beatemup", explanation: "Falsch. Spiele, in denen zwei Kontrahenten in einer Arena gegeneinander kämpfen, gehören zum Genre der Beat 'em ups (oder Fighting Games)." },
+            { game: "Cities: Skylines 2", correct: "strategie", explanation: "Das ist nicht richtig. Hier geht es um das Planen, Bauen und Verwalten einer Stadt. Das fällt unter Aufbau- und Strategiespiele." },
+            { game: "Microsoft Flight Simulator", correct: "simulation", explanation: "Falsche Antwort. Dieses Spiel versucht, eine reale Tätigkeit – das Fliegen eines Flugzeugs – so exakt wie möglich nachzubilden. Das ist die Definition einer Simulation." },
+            { game: "Hades", correct: "action", explanation: "Das ist nicht ganz richtig. 'Indie-Game' ist eine Kategorie, die die Herkunft (unabhängiges Studio) beschreibt, aber kein Spielgenre. Vom Gameplay her ist Hades mit seinen schnellen Kämpfen klar dem Action-Genre zuzuordnen." },
+            { game: "Cyberpunk 2077", correct: "rpg", explanation: "Obwohl es intensive Shooter-Elemente hat, ist das Kern-Gameplay von Cyberpunk 2077 ein Rollenspiel (RPG). Die Story-Entscheidungen, Dialoge und Charakter-Skill-Systeme sind hier dominant." },
+            { game: "Life is Strange", correct: "adventure", explanation: "Nicht korrekt. In diesem Spiel stehen die Geschichte, die Erkundung der Umgebung und das Lösen kleiner Rätsel durch Dialoge im Vordergrund. Das ist typisch für ein Adventure." },
+            { game: "EndeavorRx", correct: "serious", explanation: "Falsch. EndeavorRx ist ein Spiel, das zu medizinischen Zwecken (Behandlung von ADHS) entwickelt wurde. Spiele, deren Hauptzweck nicht die Unterhaltung ist, nennt man Serious Games." }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const questionCounter = document.getElementById('question-counter');
+        const gameTitle = document.getElementById('game-title');
+        const genreSelect = document.getElementById('genre-select');
+        const feedbackDiv = document.getElementById('feedback');
+        const checkBtn = document.getElementById('check-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const progressBar = document.getElementById('progress-bar');
+        
+        function loadQuestion() {
+            const question = questions[currentQuestionIndex];
+            questionCounter.textContent = `Frage ${currentQuestionIndex + 1} von ${questions.length}`;
+            gameTitle.textContent = question.game;
+            genreSelect.value = "";
+            genreSelect.disabled = false;
+            feedbackDiv.style.display = 'none';
+            checkBtn.style.display = 'inline-block';
+            nextBtn.style.display = 'none';
+            updateProgressBar();
+        }
+
+        function checkAnswer() {
+            const selectedAnswer = genreSelect.value;
+            const correctAnswer = questions[currentQuestionIndex].correct;
+            const explanation = questions[currentQuestionIndex].explanation;
+
+            if (!selectedAnswer) {
+                alert("Bitte wähle ein Genre aus!");
+                return;
+            }
+
+            feedbackDiv.style.display = 'block';
+            genreSelect.disabled = true;
+            checkBtn.style.display = 'none';
+            nextBtn.style.display = 'inline-block';
+
+            if (selectedAnswer === correctAnswer) {
+                score++;
+                feedbackDiv.textContent = "Korrekt! Sehr gut erkannt.";
+                feedbackDiv.className = 'correct';
+            } else {
+                feedbackDiv.textContent = explanation;
+                feedbackDiv.className = 'incorrect';
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showFinalResults();
+            }
+        }
+        
+        function showFinalResults() {
+            document.getElementById('question-view').style.display = 'none';
+            const finalView = document.getElementById('final-view');
+            finalView.style.display = 'block';
+            
+            const finalScoreEl = document.getElementById('final-score');
+            const finalFeedbackEl = document.getElementById('final-feedback');
+            finalScoreEl.textContent = `${score} / ${questions.length}`;
+
+            let feedbackText = '';
+            const percentage = (score / questions.length) * 100;
+            if (percentage === 100) {
+                feedbackText = "Fantastisch! Du bist ein wahrer Genre-Meister!";
+            } else if (percentage >= 75) {
+                feedbackText = "Sehr gut! Du hast ein ausgezeichnetes Gespür für Spiele.";
+            } else if (percentage >= 50) {
+                feedbackText = "Gut gemacht! Ein paar knifflige Fälle waren dabei, aber du bist auf dem richtigen Weg.";
+            } else {
+                feedbackText = "Das ist ein guter Anfang. Wiederhole den Test, um dein Wissen zu festigen!";
+            }
+            finalFeedbackEl.textContent = feedbackText;
+            updateProgressBar();
+        }
+        
+        function updateProgressBar() {
+            const progress = (currentQuestionIndex / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Initial load
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
+
