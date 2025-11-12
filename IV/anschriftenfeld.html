@@ -35,20 +35,54 @@
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen flex items-center justify-center p-4">
 
-    <div class="bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-lg">
-        
-        <!-- Titel -->
-        <h1 class="text-2xl sm:text-3xl font-bold text-center text-blue-400 mb-2">
-            Übung Anschriftenfelder nach DIN 5008
-        </h1>
-        
-        <!-- Punktestand -->
-        <h2 id="scoreDisplay" class="text-xl font-semibold text-center text-gray-400 mb-6">
-            Punkte: 0 / 20
-        </h2>
-        
-        <div class="space-y-6">
+    <!-- Container für den gesamten Prozess -->
+    <div class="w-full max-w-lg">
+
+        <!-- 1. Startbildschirm (zunächst sichtbar) -->
+        <div id="start-screen" class="bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-2xl">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-blue-400 mb-6">
+                Übung Anschriftenfelder
+            </h1>
+            <p class="text-center text-gray-300 mb-6">Bitte trage deinen Namen und deine Klasse ein, um zu starten. Diese Daten werden für dein Zertifikat benötigt.</p>
             
+            <form id="start-form" class="space-y-4">
+                <div>
+                    <label for="studentNameInput" class="block text-sm font-medium text-gray-300 mb-2">Dein Name:</label>
+                    <input type="text" id="studentNameInput" required 
+                           class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-gray-300 font-medium text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:outline-none" 
+                           placeholder="z.B. Max Mustermann">
+                </div>
+                <div>
+                    <label for="studentClassInput" class="block text-sm font-medium text-gray-300 mb-2">Deine Klasse:</label>
+                    <input type="text" id="studentClassInput" required 
+                           class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-gray-300 font-medium text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:outline-none" 
+                           placeholder="z.B. 10A">
+                </div>
+                <div class="pt-4">
+                    <button type="submit" id="startButton" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-lg transition duration-200 shadow-lg">
+                        Übung starten
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Copyright Footer -->
+            <p class="text-center text-xs text-gray-600 mt-8">Copyright J. Mangold</p>
+
+        </div>
+
+        <!-- 2. App-Bildschirm (zunächst versteckt) -->
+        <div id="app-screen" class="hidden bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full">
+            
+            <!-- Titel -->
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-blue-400 mb-2">
+                Übung Anschriftenfelder nach DIN 5008
+            </h1>
+            
+            <!-- Punktestand -->
+            <div class="text-center text-lg sm:text-xl font-bold text-gray-300 mb-6" id="scoreDisplay">
+                Punkte: 0 / 20
+            </div>
+
             <!-- Aufgaben-Sektion -->
             <div>
                 <h2 class="text-xl font-semibold mb-3 border-b border-gray-700 pb-2">
@@ -57,30 +91,31 @@
                 <p class="text-sm text-gray-400 mb-4">Fülle nur das Anschriftenfeld (nach DIN 5008) mit den Infos aus dem Aufgabentext:</p>
                 <!-- Hier werden die Aufgabendetails per JS eingefügt -->
                 <div id="task-details" class="bg-gray-700 p-4 rounded-lg space-y-2 text-gray-200">
-                    <!-- Der Aufgabentext wird hier eingefügt -->
+                    <!-- Task text appears here -->
                 </div>
             </div>
             
             <!-- Lösungs-Sektion (Jetzt Eingabe) -->
-            <div>
+            <div class="mt-6">
                 <h2 class="text-xl font-semibold mb-3 border-b border-gray-700 pb-2">
                     Anschriftenfeld:
                 </h2>
                 <!-- Eingabefeld für den Schüler -->
                 <textarea id="userInput" 
-                    rows="5" 
-                    class="w-full bg-gray-900 border border-gray-700 rounded-lg p-4 text-gray-300 font-medium text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:outline-none" 
-                    placeholder="Tippe hier die korrekte Anschrift ein..."></textarea>
-                
-                <!-- Feedback-Container -->
-                <div id="feedback" class="mt-4 text-center font-medium text-lg"></div>
-
-                <!-- Container für die korrekte Lösung (wird bei Bedarf gezeigt) -->
-                <div id="correct-solution-container" class="hidden mt-4">
-                    <h3 class="font-semibold text-gray-400">Korrekte Lösung:</h3>
-                    <div class="bg-gray-900 border border-green-700 rounded-lg p-4 mt-2">
-                        <pre id="solution-display" class="text-green-300 font-medium text-sm sm:text-base"></pre>
-                    </div>
+                          class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-gray-300 font-medium text-sm sm:text-base h-40 focus:ring-2 focus:ring-blue-500 focus:outline-none" 
+                          placeholder="Tippe hier deine Lösung..."></textarea>
+            </div>
+            
+            <!-- Feedback-Sektion -->
+            <div id="feedback" class="mt-4 text-center font-medium text-lg">
+                <!-- Feedback (z.B. "Richtig!" oder "Falsch!") wird hier per JS eingefügt -->
+            </div>
+            
+            <!-- Container für die korrekte Lösung (wird bei Bedarf gezeigt) -->
+            <div id="correct-solution-container" class="hidden mt-4">
+                <h3 class="font-semibold text-gray-400">Korrekte Lösung:</h3>
+                <div class="bg-gray-900 border border-green-700 rounded-lg p-4 mt-2">
+                    <pre id="solution-display" class="text-green-300 font-medium text-sm sm:text-base"></pre>
                 </div>
             </div>
             
@@ -101,270 +136,263 @@
                 </button>
             </div>
             
+            <!-- Copyright Footer -->
+            <p class="text-center text-xs text-gray-600 mt-8">Copyright J. Mangold</p>
+            
         </div>
     </div>
 
     <script>
         // --- DATENSPEICHER ---
-        // (Titel entfernt)
         const anreden = ["Herrn", "Frau"];
-        const vornamenW = ["Anna", "Maria", "Sophie", "Lena", "Lea", "Emma", "Hannah", "Margit", "Sonja"];
-        const vornamenM = ["Max", "Paul", "Leon", "Jonas", "Finn", "Elias", "Luca", "Thorsten", "Udo"];
+        const vornamenM = ["Max", "Moritz", "Hans", "Peter", "Jürgen", "Michael", "Andreas", "Thomas", "Thorsten", "Udo"];
+        const vornamenW = ["Anna", "Maria", "Lisa", "Sabine", "Petra", "Susanne", "Monika", "Claudia", "Margit", "Sonja"];
         const nachnamen = ["Müller", "Schmidt", "Schneider", "Fischer", "Weber", "Meyer", "Wagner", "Becker", "Schulz", "Stein", "Birkenfelder", "Meier", "Timm", "Maurer"];
         
         const firmenPraefixe = ["Bäckerei", "Handel", "Agentur", "Design", "Software", "Weinhandel", "Trampolino", "Hüpfburgen"];
-        const firmenSuffixe = ["GmbH", "AG", "KG", "OHG", "e.K.", "GmbH & Co. KG", "Edeltropfen GmbH"];
+        const firmenSuffixe = ["GmbH", "AG", "KG", "OHG", "e. K.", "GmbH & Co. KG", "Edeltropfen GmbH"];
         
         const strassen = ["Hauptstraße", "Goethestraße", "Schillerstraße", "Bahnhofstraße", "Musterweg", "Berliner Straße", "Ringstraße", "Schulstraße", "Nürnberger Str.", "Am Alten Schloss", "Landshuter Str.", "Tannenweg", "Alte Gasse"];
-        const staedte = ["Musterstadt", "Berlin", "Hamburg", "München", "Köln", "Frankfurt", "Stuttgart", "Düsseldorf", "Leipzig", "Regensburg", "Coburg", "Starnberg", "Nürnberg"];
-
-        // --- HILFSFUNKTIONEN ---
-        
-        /**
-         * Wählt ein zufälliges Element aus einem Array.
-         * @param {Array<string>} arr Das Array, aus dem gewählt wird.
-         * @returns {string} Ein zufälliges Element.
-         */
-        function getRandomElement(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
-        }
-
-        /**
-         * Mischt ein Array (Fisher-Yates-Algorithmus).
-         * @param {Array<any>} array Das zu mischende Array.
-         * @returns {Array<any>} Das gemischte Array.
-         */
-        /*
-        function shuffleArray(array) {
-            let newArr = [...array]; // Kopie erstellen, um das Original nicht zu verändern
-            for (let i = newArr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
-            }
-            return newArr;
-        }
-        */ // Nicht mehr benötigt, da wir Fließtext generieren
-
-        /**
-         * Generiert eine zufällige 5-stellige Postleitzahl.
-         * @returns {string} Eine 5-stellige PLZ als String.
-         */
-        function generatePLZ() {
-            // Verwendet jetzt auch die echten PLZs für mehr Realismus
-            const echtePLZs = ["93059", "96450", "80333", "82319", "90190"];
-            if (Math.random() < 0.5) {
-                return getRandomElement(echtePLZs);
-            }
-            return Math.floor(10000 + Math.random() * 90000).toString();
-        }
-
-        /**
-         * Generiert eine zufällige Hausnummer.
-         * @returns {string} Eine Hausnummer (z.B. "12" oder "123a").
-         */
-        function generateHausnummer() {
-            const num = Math.floor(1 + Math.random() * 150);
-            return Math.random() < 0.1 ? `${num} ${getRandomElement(["a", "b", "c"])}` : num.toString();
-        }
-
-        /**
-         * Generiert ein zufälliges Postfach.
-         * @returns {string} Format: "XX XX XX"
-         */
-        function generatePostfach() {
-            const teil1 = Math.floor(10 + Math.random() * 90);
-            const teil2 = Math.floor(10 + Math.random() * 90);
-            const teil3 = Math.floor(10 + Math.random() * 90);
-            return `${teil1} ${teil2} ${teil3}`;
-        }
+        const staedte = ["Berlin", "Hamburg", "München", "Köln", "Frankfurt", "Stuttgart", "Düsseldorf", "Leipzig", "Dortmund", "Essen", "Regensburg", "Coburg", "Starnberg", "Nürnberg"];
 
         // --- GLOBALE VARIABLEN ---
-        let currentSolution = ""; // Speichert die aktuelle Lösung
+        let currentSolution = ""; // Speichert die korrekte Lösung für die aktuelle Aufgabe
         let score = 0; // Speichert den Punktestand
+        let studentName = ""; // Wird beim Start gesetzt
+        let studentClass = ""; // Wird beim Start gesetzt
+        const maxScore = 20; // Ziel-Punktestand
 
-        // --- DOM-REFERZENZEN ---
+        // --- DOM-Elemente ---
+        // Startbildschirm
+        const startScreenEl = document.getElementById('start-screen');
+        const startFormEl = document.getElementById('start-form');
+        const studentNameInputEl = document.getElementById('studentNameInput');
+        const studentClassInputEl = document.getElementById('studentClassInput');
+        
+        // App-Bildschirm
+        const appScreenEl = document.getElementById('app-screen');
+        const scoreDisplayEl = document.getElementById('scoreDisplay');
         const taskDetailsEl = document.getElementById('task-details');
         const userInputEl = document.getElementById('userInput');
         const feedbackEl = document.getElementById('feedback');
         const correctSolutionContainerEl = document.getElementById('correct-solution-container');
         const solutionDisplayEl = document.getElementById('solution-display');
-        const scoreDisplayEl = document.getElementById('scoreDisplay');
         
-        const newTaskButton = document.getElementById('newTaskButton');
+        // Buttons
         const checkButton = document.getElementById('checkButton');
+        const newTaskButton = document.getElementById('newTaskButton');
         const certButton = document.getElementById('certButton');
 
         
         // --- KERNLOGIK ---
 
         /**
-         * Aktualisiert die Punkteanzeige und prüft auf Sieg.
+         * Startet die App nach Eingabe von Name und Klasse
          */
-        function updateScoreDisplay() {
-            scoreDisplayEl.textContent = `Punkte: ${score.toFixed(1)} / 20`;
-            if (score >= 20) {
-                scoreDisplayEl.textContent = `Punkte: ${score.toFixed(1)} - Ziel erreicht!`;
-                scoreDisplayEl.classList.add("text-green-400");
-                certButton.classList.remove("hidden");
-                // Optional: Zeige eine einmalige Siegesmeldung im Feedback
-                if (feedbackEl.textContent === "") {
-                    feedbackEl.textContent = "Herzlichen Glückwunsch! Du hast das Ziel erreicht!";
-                    feedbackEl.className = 'mt-4 text-center font-medium text-lg text-green-400';
-                }
+        function startApp(event) {
+            event.preventDefault(); // Verhindert das Neuladen der Seite
+            studentName = studentNameInputEl.value.trim();
+            studentClass = studentClassInputEl.value.trim();
+            
+            if (studentName && studentClass) {
+                startScreenEl.classList.add('hidden');
+                appScreenEl.classList.remove('hidden');
+                generateTask(); // Erste Aufgabe laden
             }
+        }
+        
+        /**
+         * Wählt ein zufälliges Element aus einem Array
+         * @param {Array} arr Das Array
+         * @returns {*} Ein zufälliges Element
+         */
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
         }
 
         /**
-         * Zeigt die Aufgabe als Fließtext im HTML an.
-         * @param {string} taskText - Der generierte Aufgabentext.
+         * Generiert eine zufällige 5-stellige PLZ
+         */
+        function generatePLZ() {
+            return Math.floor(10000 + Math.random() * 90000).toString();
+        }
+
+        /**
+         * Generiert eine zufällige Hausnummer (z.B. 17 oder 27 a)
+         */
+        function generateHausnummer() {
+            const num = Math.floor(Math.random() * 150) + 1;
+            if (Math.random() > 0.8) { // In 20% der Fälle mit Buchstabe
+                const buchstabe = String.fromCharCode(97 + Math.floor(Math.random() * 5)); // a-e
+                return `${num} ${buchstabe}`;
+            }
+            return num.toString();
+        }
+
+        /**
+         * Aktualisiert die Anzeige des Punktestands
+         */
+        function updateScoreDisplay() {
+            scoreDisplayEl.textContent = `Punkte: ${score.toFixed(0)} / ${maxScore}`;
+            if (score >= maxScore && certButton.classList.contains('hidden')) {
+                certButton.classList.remove('hidden');
+                scoreDisplayEl.classList.add('text-green-400');
+            }
+        }
+        
+        /**
+         * Zeigt den Aufgabentext (Fließtext) an
          */
         function displayTask(taskText) {
             taskDetailsEl.innerHTML = ''; // Vorherige Aufgabe löschen
             const p = document.createElement('p');
-            p.className = "text-sm sm:text-base leading-relaxed"; // Bessere Lesbarkeit für Fließtext
             p.textContent = taskText;
             taskDetailsEl.appendChild(p);
         }
 
         /**
-         * Normalisiert einen String für einen fairen Vergleich.
-         * - Entfernt Leerzeichen an Anfang/Ende
-         * - Konvertiert zu Kleinbuchstaben
-         * - Vereinheitlicht Zeilenumbrüche und entfernt Leerzeilen
-         * - Ersetzt mehrere Leerzeichen durch eines
+         * Normalisiert einen mehrzeiligen String für den Vergleich (entfernt überflüssige Leerzeichen, etc.)
          * @param {string} str Der zu normalisierende String
          * @returns {string} Der normalisierte String
          */
         function normalizeString(str) {
             if (!str) return "";
             return str
-                .trim()
-                .toLowerCase()
+                .trim() // Entfernt Leerzeichen am Anfang und Ende
+                .toLowerCase() // Alles in Kleinbuchstaben
                 .split('\n') // In Zeilen aufteilen
                 .map(line => line.trim().replace(/\s+/g, ' ')) // Jede Zeile trimmen & interne Leerzeichen normalisieren
-                .filter(line => line.length > 0) // Leere Zeilen entfernen (KORRIGIERT von .readonly)
+                .filter(line => line.length > 0) // Leere Zeilen entfernen
                 .join('\n'); // Wieder zusammenfügen
+        }
+
+        /**
+         * Normalisiert eine EINZELNE Zeile für den Vergleich.
+         * @param {string} line Die zu normalisierende Zeile
+         * @returns {string} Die normalisierte Zeile
+         */
+        function normalizeLine(line) {
+            if (!line) return "";
+            // Trimmen, Kleinbuchstaben, innere Leerzeichen normalisieren
+            return line.trim().toLowerCase().replace(/\s+/g, ' ');
         }
 
         /**
          * Generiert eine neue Aufgabe und die dazugehörige Lösung.
          */
         function generateTask() {
-            // Zurücksetzen
-            userInputEl.value = '';
-            feedbackEl.textContent = '';
-            feedbackEl.className = 'mt-4 text-center font-medium text-lg';
+            // Reset
+            userInputEl.value = "";
+            feedbackEl.textContent = "";
             correctSolutionContainerEl.classList.add('hidden');
-            solutionDisplayEl.textContent = '';
-            checkButton.disabled = false; // Button wieder aktivieren
-
-            currentSolution = '';
-            let taskText = ""; // Der Fließtext für die Aufgabe
+            checkButton.disabled = false;
+            
             let solutionLines = [];
+            let taskData = {};
+            let taskText = "";
 
-            const isCompany = Math.random() < 0.5; // 50/50 Chance
+            const isCompany = Math.random() > 0.4; // 60% Firmen, 40% Privat
+
+            // Zufällige Basisdaten
+            const stadt = getRandomElement(staedte);
+            const plz = generatePLZ();
+            const strasse = getRandomElement(strassen);
+            const hausnummer = generateHausnummer();
+            
+            // Logik für Anrede und Name
+            const anrede = getRandomElement(anreden); // "Herrn" oder "Frau"
+            const vorname = (anrede === "Herrn") ? getRandomElement(vornamenM) : getRandomElement(vornamenW);
+            const nachname = getRandomElement(nachnamen);
+            const vollerName = `${vorname} ${nachname}`;
 
             if (isCompany) {
                 // --- FIRMENANSCHRIFT ---
-                const firmaName = `${getRandomElement(firmenPraefixe)} ${getRandomElement(nachnamen)} ${getRandomElement(firmenSuffixe)}`;
-                solutionLines.push(firmaName);
+                const firmaPraefix = getRandomElement(firmenPraefixe);
+                const firmaSuffix = getRandomElement(firmenSuffixe);
+                const firmenName = `${firmaPraefix} ${nachname} ${firmaSuffix}`;
                 
-                // 70% Chance auf Ansprechpartner
-                const hasContactPerson = Math.random() < 0.7; 
-                if (hasContactPerson) {
-                    const anrede = getRandomElement(anreden);
-                    const vorname = anrede.startsWith("Frau") ? getRandomElement(vornamenW) : getRandomElement(vornamenM);
-                    const nachname = getRandomElement(nachnamen);
-                    
-                    const ansprechpartner = `${anrede} ${vorname} ${nachname}`;
-                    solutionLines.push(ansprechpartner); // KORREKT: Anrede und Name des Ansprechpartners in EINER Zeile
-                
-                    // Narrative für Firma MIT Ansprechpartner
-                    taskText = `Erstellen Sie ein Anschreiben für die Firma "${firmaName}". Ihr Ansprechpartner dort ist ${anrede.replace("Herrn", "Herr")} ${vorname} ${nachname}.`;
+                // Aufbau der Lösung (mit "Herrn" oder "Frau")
+                solutionLines.push(firmenName);
+                solutionLines.push(`${anrede} ${vollerName}`);
+                solutionLines.push(`${strasse} ${hausnummer}`);
+                solutionLines.push(`${plz} ${stadt}`);
 
-                } else {
-                    // Narrative für Firma OHNE Ansprechpartner
-                    taskText = `Senden Sie einen Katalog an die Firma "${firmaName}".`;
-                }
+                // Aufbau des Aufgabentexts
+                // Grammatikalische Korrektur: "Herrn" (Lösung) vs. "Herr" (Aufgabentext)
+                let anredeText = (anrede === "Herrn") ? "Herr" : "Frau";
+                taskText = `Erstelle das Anschriftenfeld für einen Brief an die Firma ${firmenName}. Dein Ansprechpartner ist ${anredeText} ${vollerName}. Die Firma sitzt in der ${strasse} ${hausnummer} in ${plz} ${stadt}.`;
 
-                // 30% Chance auf Postfach statt Straße
-                const hasPOBox = Math.random() < 0.3; 
-                const plz = generatePLZ();
-                const stadt = getRandomElement(staedte);
-                
-                if (hasPOBox) {
-                    const postfach = generatePostfach();
-                    solutionLines.push(`Postfach ${postfach}`);
-                    solutionLines.push(`${plz} ${stadt}`);
-                    
-                    // Narrative ergänzen
-                    taskText += ` Die Firma nutzt das Postfach ${postfach} in ${stadt} (PLZ ${plz}).`;
-
-                } else {
-                    const strasse = getRandomElement(strassen);
-                    const hausnummer = generateHausnummer();
-                    solutionLines.push(`${strasse} ${hausnummer}`);
-                    solutionLines.push(`${plz} ${stadt}`);
-
-                    // Narrative ergänzen
-                    taskText += ` Die Büroadresse lautet: ${strasse} ${hausnummer}, ${plz} ${stadt}.`;
-                }
             } else {
                 // --- PRIVATANSCHRIFT ---
-                const anrede = getRandomElement(anreden); // Nur noch "Herrn" oder "Frau"
-                const vorname = anrede.startsWith("Frau") ? getRandomElement(vornamenW) : getRandomElement(vornamenM);
-                const nachname = getRandomElement(nachnamen);
-                const strasse = getRandomElement(strassen);
-                const hausnummer = generateHausnummer();
-                const plz = generatePLZ();
-                const stadt = getRandomElement(staedte);
+                
+                // Aufbau der Lösung
+                // Anrede kommt auf *eigene* Zeile
+                solutionLines.push(anrede);
+                solutionLines.push(vollerName);
+                solutionLines.push(`${strasse} ${hausnummer}`);
+                solutionLines.push(`${plz} ${stadt}`);
 
-                // Narrative für Privatperson
-                taskText = `Schreiben Sie einen persönlichen Brief an ${anrede.replace("Herrn", "Herr")} ${vorname} ${nachname}. Die Person wohnt in der ${strasse} ${hausnummer} in ${plz} ${stadt}.`;
-
-                // KORREKTUR FÜR PRIVATPERSONEN (gemäß Ihren Beispielen)
-                solutionLines.push(anrede); // Zeile 1: Anrede (z.B. "Herrn")
-                solutionLines.push(`${vorname} ${nachname}`); // Zeile 2: Name (z.B. "Thorsten Timm")
-                solutionLines.push(`${strasse} ${hausnummer}`); // Zeile 3: Straße
-                solutionLines.push(`${plz} ${stadt}`); // Zeile 4: PLZ Ort
+                // Aufbau des Aufgabentexts
+                // Hier ist "an Herrn..." (Akkusativ) korrekt.
+                taskText = `Du schreibst einen privaten Brief an ${anrede} ${vollerName}. Die Adresse lautet: ${strasse} ${hausnummer}, ${plz} ${stadt}.`;
             }
 
-            // Finale Lösung speichern und Aufgabe anzeigen
+            // Speichern und anzeigen
             currentSolution = solutionLines.join('\n');
             displayTask(taskText); // Übergibt den Fließtext
         }
 
         /**
          * Prüft die Eingabe des Benutzers, vergibt Teilpunkte und deaktiviert den Button.
+         * NEU: Gibt spezifisches Feedback bei fehlendem Leerzeichen nach Punkt.
          */
         function checkSolution() {
             checkButton.disabled = true; // Button deaktivieren, um "farmen" zu verhindern
-
-            const normalizeLine = (line) => line.trim().replace(/\s+/g, ' ').toLowerCase();
-
-            const userLines = userInput.value.trim().split('\n').map(normalizeLine);
-            const solutionLines = currentSolution.trim().split('\n').map(normalizeLine);
+            
+            let specificFeedback = ""; // Für den neuen Hinweis
+            
+            // Wir brauchen die rohen Zeilen für die Detail-Fehlersuche
+            const userLinesRaw = userInputEl.value.trim().split('\n');
+            const solutionLinesRaw = currentSolution.trim().split('\n');
 
             let correctLines = 0;
-            const totalLines = solutionLines.length;
+            const totalLines = solutionLinesRaw.length;
 
             for (let i = 0; i < totalLines; i++) {
-                if (userLines[i] === solutionLines[i]) {
+                const userLine = userLinesRaw[i] || "";
+                const solutionLine = solutionLinesRaw[i] || "";
+
+                if (normalizeLine(userLine) === normalizeLine(solutionLine)) {
                     correctLines++;
+                } else {
+                    // Zeile ist falsch. Prüfen, ob es am fehlenden Leerzeichen nach Punkt liegt.
+                    // Regex: Sucht nach einem Punkt (\.) gefolgt von einem Nicht-Leerzeichen (\S)
+                    if (userLine.match(/\.\S/g)) {
+                        specificFeedback = "Hinweis: Achte auf das Leerzeichen nach einem Punkt (z.B. bei 'Str.' oder 'e. K.').";
+                    }
                 }
             }
             
-            const pointsEarned = correctLines * 0.5;
+            const pointsEarned = correctLines; // GEÄNDERT: 1 Punkt pro Zeile
             score += pointsEarned;
             updateScoreDisplay();
 
-            // Feedback geben
+            // Haupt-Feedback geben
+            let primaryFeedback = "";
             if (correctLines === totalLines) {
-                feedbackEl.textContent = `Perfekt! ${correctLines} von ${totalLines} Zeilen richtig. (+${pointsEarned.toFixed(1)} Punkte)`;
+                primaryFeedback = `Perfekt! ${correctLines} von ${totalLines} Zeilen richtig. (+${pointsEarned} Punkte)`;
                 feedbackEl.className = 'mt-4 text-center font-medium text-lg text-green-400';
             } else {
-                feedbackEl.textContent = `Ergebnis: ${correctLines} von ${totalLines} Zeilen richtig. (+${pointsEarned.toFixed(1)} Punkte)`;
+                primaryFeedback = `Ergebnis: ${correctLines} von ${totalLines} Zeilen richtig. (+${pointsEarned} Punkte)`;
                 feedbackEl.className = 'mt-4 text-center font-medium text-lg text-yellow-400';
+            }
+
+            // Spezifisches Feedback anhängen, falls vorhanden
+            if (specificFeedback) {
+                // Verwendet innerHTML, um einen Zeilenumbruch und andere Formatierung zu ermöglichen
+                feedbackEl.innerHTML = `${primaryFeedback}<br><span class="text-sm text-cyan-400">${specificFeedback}</span>`;
+            } else {
+                feedbackEl.textContent = primaryFeedback;
             }
             
             // Immer die korrekte Lösung zum Vergleichen anzeigen
@@ -373,32 +401,68 @@
         }
 
         /**
-         * Generiert und löst den Download des PDF-Zertifikats aus.
+         * Setzt die Oberfläche für eine neue Aufgabe zurück.
          */
-        function downloadCertificate() {
+        function prepareNewTask() {
+            generateTask();
+            checkButton.disabled = false;
+        }
+
+        /**
+         * Generiert ein PDF-Zertifikat mit den Daten des Schülers.
+         */
+        function generateCertificate() {
+            // Dynamisch jsPDF laden (falls es global verfügbar ist)
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+
+            const today = new Date();
+            const dateStr = `${today.getDate()}.${today.getMonth() + 1}.${today.getFullYear()}`;
+
+            // PDF-Inhalt
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(24);
+            doc.setTextColor(40, 58, 122); // Tailwind blue-700
+            doc.text("Zertifikat", 105, 40, { align: "center" });
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(16);
+            doc.setTextColor(17, 24, 39); // Tailwind gray-900
             
-            doc.setFontSize(22);
-            doc.text("Zertifikat", 105, 30, { align: 'center' });
+            doc.text("Hiermit wird bestätigt, dass:", 105, 70, { align: "center" });
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.text(studentName, 105, 90, { align: "center" });
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(16);
+            doc.text(`Klasse: ${studentClass}`, 105, 100, { align: "center" });
+
+            doc.text("die Übung zu den Anschriftenfeldern", 105, 120, { align: "center" });
+            doc.text("nach DIN 5008 erfolgreich", 105, 130, { align: "center" });
+            doc.text("abgeschlossen hat.", 105, 140, { align: "center" });
 
             doc.setFontSize(14);
-            doc.text("Hiermit wird bestätigt,", 105, 50, { align: 'center' });
-            doc.text("dass die Übung zu Anschriftenfeldern (DIN 5008)", 105, 60, { align: 'center' });
-            doc.text(`mit ${score.toFixed(1)} Punkten erfolgreich bestanden wurde.`, 105, 70, { align: 'center' });
+            doc.text(`Erreichte Punktzahl: ${score.toFixed(0)}`, 105, 160, { align: "center" });
 
-            const today = new Date().toLocaleDateString('de-DE');
-            doc.text(`Datum: ${today}`, 105, 90, { align: 'center' });
+            doc.setFontSize(12);
+            doc.setTextColor(107, 114, 128); // Tailwind gray-500
+            doc.text(`Ausgestellt am: ${dateStr}`, 105, 180, { align: "center" });
+            
+            doc.text("Copyright J. Mangold", 105, 200, { align: "center" });
 
-            doc.save("Zertifikat-DIN5008.pdf");
+
+            // Speichern
+            doc.save(`Zertifikat-DIN5008-${studentName.replace(/ /g, '_')}.pdf`);
         }
 
 
         // --- EVENT LISTENERS ---
-        document.addEventListener('DOMContentLoaded', generateTask); // Erste Aufgabe beim Laden generieren
-        newTaskButton.addEventListener('click', generateTask);
+        startFormEl.addEventListener('submit', startApp);
+        newTaskButton.addEventListener('click', prepareNewTask);
         checkButton.addEventListener('click', checkSolution);
-        certButton.addEventListener('click', downloadCertificate);
+        certButton.addEventListener('click', generateCertificate);
 
     </script>
 </body>
