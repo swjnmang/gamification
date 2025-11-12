@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Übung Anschriftenfelder nach DIN 5008</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF zum Generieren von Zertifikaten -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Kleine Anpassung für die Lösungsanzeige */
+        #solution-display {
+            white-space: pre;
+            line-height: 1.6;
+        }
+        textarea {
+            white-space: pre;
+            line-height: 1.6;
+        }
+        /* Verhindert Klick-Events, wenn der Button deaktiviert ist */
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-lg">
+        
+        <!-- Titel -->
+        <h1 class="text-2xl sm:text-3xl font-bold text-center text-blue-400 mb-2">
+            Übung Anschriftenfelder nach DIN 5008
+        </h1>
+        
+        <!-- Punktestand -->
+        <h2 id="scoreDisplay" class="text-xl font-semibold text-center text-gray-400 mb-6">
+            Punkte: 0 / 20
+        </h2>
+        
+        <div class="space-y-6">
+            
+            <!-- Aufgaben-Sektion -->
+            <div>
+                <h2 class="text-xl font-semibold mb-3 border-b border-gray-700 pb-2">
+                    Aufgabe:
+                </h2>
+                <p class="text-sm text-gray-400 mb-4">Fülle nur das Anschriftenfeld (nach DIN 5008) mit den Infos aus dem Aufgabentext:</p>
+                <!-- Hier werden die Aufgabendetails per JS eingefügt -->
+                <div id="task-details" class="bg-gray-700 p-4 rounded-lg space-y-2 text-gray-200">
+                    <!-- Der Aufgabentext wird hier eingefügt -->
+                </div>
+            </div>
+            
+            <!-- Lösungs-Sektion (Jetzt Eingabe) -->
+            <div>
+                <h2 class="text-xl font-semibold mb-3 border-b border-gray-700 pb-2">
+                    Anschriftenfeld:
+                </h2>
+                <!-- Eingabefeld für den Schüler -->
+                <textarea id="userInput" 
+                    rows="5" 
+                    class="w-full bg-gray-900 border border-gray-700 rounded-lg p-4 text-gray-300 font-medium text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:outline-none" 
+                    placeholder="Tippe hier die korrekte Anschrift ein..."></textarea>
+                
+                <!-- Feedback-Container -->
+                <div id="feedback" class="mt-4 text-center font-medium text-lg"></div>
+
+                <!-- Container für die korrekte Lösung (wird bei Bedarf gezeigt) -->
+                <div id="correct-solution-container" class="hidden mt-4">
+                    <h3 class="font-semibold text-gray-400">Korrekte Lösung:</h3>
+                    <div class="bg-gray-900 border border-green-700 rounded-lg p-4 mt-2">
+                        <pre id="solution-display" class="text-green-300 font-medium text-sm sm:text-base"></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Steuerungs-Knöpfe -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                <button id="checkButton" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-lg transition duration-200 shadow-lg">
+                    Lösung prüfen
+                </button>
+                <button id="newTaskButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg transition duration-200 shadow-lg">
+                    Neue Aufgabe
+                </button>
+            </div>
+            
+            <!-- Zertifikat-Button (zunächst versteckt) -->
+            <div class="pt-2">
+                <button id="certButton" class="hidden w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-5 rounded-lg transition duration-200 shadow-lg">
+                    Zertifikat herunterladen
+                </button>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        // --- DATENSPEICHER ---
+        // (Titel entfernt)
+        const anreden = ["Herrn", "Frau"];
+        const vornamenW = ["Anna", "Maria", "Sophie", "Lena", "Lea", "Emma", "Hannah", "Margit", "Sonja"];
+        const vornamenM = ["Max", "Paul", "Leon", "Jonas", "Finn", "Elias", "Luca", "Thorsten", "Udo"];
+        const nachnamen = ["Müller", "Schmidt", "Schneider", "Fischer", "Weber", "Meyer", "Wagner", "Becker", "Schulz", "Stein", "Birkenfelder", "Meier", "Timm", "Maurer"];
+        
+        const firmenPraefixe = ["Bäckerei", "Handel", "Agentur", "Design", "Software", "Weinhandel", "Trampolino", "Hüpfburgen"];
+        const firmenSuffixe = ["GmbH", "AG", "KG", "OHG", "e.K.", "GmbH & Co. KG", "Edeltropfen GmbH"];
+        
+        const strassen = ["Hauptstraße", "Goethestraße", "Schillerstraße", "Bahnhofstraße", "Musterweg", "Berliner Straße", "Ringstraße", "Schulstraße", "Nürnberger Str.", "Am Alten Schloss", "Landshuter Str.", "Tannenweg", "Alte Gasse"];
+        const staedte = ["Musterstadt", "Berlin", "Hamburg", "München", "Köln", "Frankfurt", "Stuttgart", "Düsseldorf", "Leipzig", "Regensburg", "Coburg", "Starnberg", "Nürnberg"];
+
+        // --- HILFSFUNKTIONEN ---
+        
+        /**
+         * Wählt ein zufälliges Element aus einem Array.
+         * @param {Array<string>} arr Das Array, aus dem gewählt wird.
+         * @returns {string} Ein zufälliges Element.
+         */
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        /**
+         * Mischt ein Array (Fisher-Yates-Algorithmus).
+         * @param {Array<any>} array Das zu mischende Array.
+         * @returns {Array<any>} Das gemischte Array.
+         */
+        /*
+        function shuffleArray(array) {
+            let newArr = [...array]; // Kopie erstellen, um das Original nicht zu verändern
+            for (let i = newArr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+            }
+            return newArr;
+        }
+        */ // Nicht mehr benötigt, da wir Fließtext generieren
+
+        /**
+         * Generiert eine zufällige 5-stellige Postleitzahl.
+         * @returns {string} Eine 5-stellige PLZ als String.
+         */
+        function generatePLZ() {
+            // Verwendet jetzt auch die echten PLZs für mehr Realismus
+            const echtePLZs = ["93059", "96450", "80333", "82319", "90190"];
+            if (Math.random() < 0.5) {
+                return getRandomElement(echtePLZs);
+            }
+            return Math.floor(10000 + Math.random() * 90000).toString();
+        }
+
+        /**
+         * Generiert eine zufällige Hausnummer.
+         * @returns {string} Eine Hausnummer (z.B. "12" oder "123a").
+         */
+        function generateHausnummer() {
+            const num = Math.floor(1 + Math.random() * 150);
+            return Math.random() < 0.1 ? `${num} ${getRandomElement(["a", "b", "c"])}` : num.toString();
+        }
+
+        /**
+         * Generiert ein zufälliges Postfach.
+         * @returns {string} Format: "XX XX XX"
+         */
+        function generatePostfach() {
+            const teil1 = Math.floor(10 + Math.random() * 90);
+            const teil2 = Math.floor(10 + Math.random() * 90);
+            const teil3 = Math.floor(10 + Math.random() * 90);
+            return `${teil1} ${teil2} ${teil3}`;
+        }
+
+        // --- GLOBALE VARIABLEN ---
+        let currentSolution = ""; // Speichert die aktuelle Lösung
+        let score = 0; // Speichert den Punktestand
+
+        // --- DOM-REFERZENZEN ---
+        const taskDetailsEl = document.getElementById('task-details');
+        const userInputEl = document.getElementById('userInput');
+        const feedbackEl = document.getElementById('feedback');
+        const correctSolutionContainerEl = document.getElementById('correct-solution-container');
+        const solutionDisplayEl = document.getElementById('solution-display');
+        const scoreDisplayEl = document.getElementById('scoreDisplay');
+        
+        const newTaskButton = document.getElementById('newTaskButton');
+        const checkButton = document.getElementById('checkButton');
+        const certButton = document.getElementById('certButton');
+
+        
+        // --- KERNLOGIK ---
+
+        /**
+         * Aktualisiert die Punkteanzeige und prüft auf Sieg.
+         */
+        function updateScoreDisplay() {
+            scoreDisplayEl.textContent = `Punkte: ${score.toFixed(1)} / 20`;
+            if (score >= 20) {
+                scoreDisplayEl.textContent = `Punkte: ${score.toFixed(1)} - Ziel erreicht!`;
+                scoreDisplayEl.classList.add("text-green-400");
+                certButton.classList.remove("hidden");
+                // Optional: Zeige eine einmalige Siegesmeldung im Feedback
+                if (feedbackEl.textContent === "") {
+                    feedbackEl.textContent = "Herzlichen Glückwunsch! Du hast das Ziel erreicht!";
+                    feedbackEl.className = 'mt-4 text-center font-medium text-lg text-green-400';
+                }
+            }
+        }
+
+        /**
+         * Zeigt die Aufgabe als Fließtext im HTML an.
+         * @param {string} taskText - Der generierte Aufgabentext.
+         */
+        function displayTask(taskText) {
+            taskDetailsEl.innerHTML = ''; // Vorherige Aufgabe löschen
+            const p = document.createElement('p');
+            p.className = "text-sm sm:text-base leading-relaxed"; // Bessere Lesbarkeit für Fließtext
+            p.textContent = taskText;
+            taskDetailsEl.appendChild(p);
+        }
+
+        /**
+         * Normalisiert einen String für einen fairen Vergleich.
+         * - Entfernt Leerzeichen an Anfang/Ende
+         * - Konvertiert zu Kleinbuchstaben
+         * - Vereinheitlicht Zeilenumbrüche und entfernt Leerzeilen
+         * - Ersetzt mehrere Leerzeichen durch eines
+         * @param {string} str Der zu normalisierende String
+         * @returns {string} Der normalisierte String
+         */
+        function normalizeString(str) {
+            if (!str) return "";
+            return str
+                .trim()
+                .toLowerCase()
+                .split('\n') // In Zeilen aufteilen
+                .map(line => line.trim().replace(/\s+/g, ' ')) // Jede Zeile trimmen & interne Leerzeichen normalisieren
+                .filter(line => line.length > 0) // Leere Zeilen entfernen (KORRIGIERT von .readonly)
+                .join('\n'); // Wieder zusammenfügen
+        }
+
+        /**
+         * Generiert eine neue Aufgabe und die dazugehörige Lösung.
+         */
+        function generateTask() {
+            // Zurücksetzen
+            userInputEl.value = '';
+            feedbackEl.textContent = '';
+            feedbackEl.className = 'mt-4 text-center font-medium text-lg';
+            correctSolutionContainerEl.classList.add('hidden');
+            solutionDisplayEl.textContent = '';
+            checkButton.disabled = false; // Button wieder aktivieren
+
+            currentSolution = '';
+            let taskText = ""; // Der Fließtext für die Aufgabe
+            let solutionLines = [];
+
+            const isCompany = Math.random() < 0.5; // 50/50 Chance
+
+            if (isCompany) {
+                // --- FIRMENANSCHRIFT ---
+                const firmaName = `${getRandomElement(firmenPraefixe)} ${getRandomElement(nachnamen)} ${getRandomElement(firmenSuffixe)}`;
+                solutionLines.push(firmaName);
+                
+                // 70% Chance auf Ansprechpartner
+                const hasContactPerson = Math.random() < 0.7; 
+                if (hasContactPerson) {
+                    const anrede = getRandomElement(anreden);
+                    const vorname = anrede.startsWith("Frau") ? getRandomElement(vornamenW) : getRandomElement(vornamenM);
+                    const nachname = getRandomElement(nachnamen);
+                    
+                    const ansprechpartner = `${anrede} ${vorname} ${nachname}`;
+                    solutionLines.push(ansprechpartner); // KORREKT: Anrede und Name des Ansprechpartners in EINER Zeile
+                
+                    // Narrative für Firma MIT Ansprechpartner
+                    taskText = `Erstellen Sie ein Anschreiben für die Firma "${firmaName}". Ihr Ansprechpartner dort ist ${anrede.replace("Herrn", "Herr")} ${vorname} ${nachname}.`;
+
+                } else {
+                    // Narrative für Firma OHNE Ansprechpartner
+                    taskText = `Senden Sie einen Katalog an die Firma "${firmaName}".`;
+                }
+
+                // 30% Chance auf Postfach statt Straße
+                const hasPOBox = Math.random() < 0.3; 
+                const plz = generatePLZ();
+                const stadt = getRandomElement(staedte);
+                
+                if (hasPOBox) {
+                    const postfach = generatePostfach();
+                    solutionLines.push(`Postfach ${postfach}`);
+                    solutionLines.push(`${plz} ${stadt}`);
+                    
+                    // Narrative ergänzen
+                    taskText += ` Die Firma nutzt das Postfach ${postfach} in ${stadt} (PLZ ${plz}).`;
+
+                } else {
+                    const strasse = getRandomElement(strassen);
+                    const hausnummer = generateHausnummer();
+                    solutionLines.push(`${strasse} ${hausnummer}`);
+                    solutionLines.push(`${plz} ${stadt}`);
+
+                    // Narrative ergänzen
+                    taskText += ` Die Büroadresse lautet: ${strasse} ${hausnummer}, ${plz} ${stadt}.`;
+                }
+            } else {
+                // --- PRIVATANSCHRIFT ---
+                const anrede = getRandomElement(anreden); // Nur noch "Herrn" oder "Frau"
+                const vorname = anrede.startsWith("Frau") ? getRandomElement(vornamenW) : getRandomElement(vornamenM);
+                const nachname = getRandomElement(nachnamen);
+                const strasse = getRandomElement(strassen);
+                const hausnummer = generateHausnummer();
+                const plz = generatePLZ();
+                const stadt = getRandomElement(staedte);
+
+                // Narrative für Privatperson
+                taskText = `Schreiben Sie einen persönlichen Brief an ${anrede.replace("Herrn", "Herr")} ${vorname} ${nachname}. Die Person wohnt in der ${strasse} ${hausnummer} in ${plz} ${stadt}.`;
+
+                // KORREKTUR FÜR PRIVATPERSONEN (gemäß Ihren Beispielen)
+                solutionLines.push(anrede); // Zeile 1: Anrede (z.B. "Herrn")
+                solutionLines.push(`${vorname} ${nachname}`); // Zeile 2: Name (z.B. "Thorsten Timm")
+                solutionLines.push(`${strasse} ${hausnummer}`); // Zeile 3: Straße
+                solutionLines.push(`${plz} ${stadt}`); // Zeile 4: PLZ Ort
+            }
+
+            // Finale Lösung speichern und Aufgabe anzeigen
+            currentSolution = solutionLines.join('\n');
+            displayTask(taskText); // Übergibt den Fließtext
+        }
+
+        /**
+         * Prüft die Eingabe des Benutzers, vergibt Teilpunkte und deaktiviert den Button.
+         */
+        function checkSolution() {
+            checkButton.disabled = true; // Button deaktivieren, um "farmen" zu verhindern
+
+            const normalizeLine = (line) => line.trim().replace(/\s+/g, ' ').toLowerCase();
+
+            const userLines = userInput.value.trim().split('\n').map(normalizeLine);
+            const solutionLines = currentSolution.trim().split('\n').map(normalizeLine);
+
+            let correctLines = 0;
+            const totalLines = solutionLines.length;
+
+            for (let i = 0; i < totalLines; i++) {
+                if (userLines[i] === solutionLines[i]) {
+                    correctLines++;
+                }
+            }
+            
+            const pointsEarned = correctLines * 0.5;
+            score += pointsEarned;
+            updateScoreDisplay();
+
+            // Feedback geben
+            if (correctLines === totalLines) {
+                feedbackEl.textContent = `Perfekt! ${correctLines} von ${totalLines} Zeilen richtig. (+${pointsEarned.toFixed(1)} Punkte)`;
+                feedbackEl.className = 'mt-4 text-center font-medium text-lg text-green-400';
+            } else {
+                feedbackEl.textContent = `Ergebnis: ${correctLines} von ${totalLines} Zeilen richtig. (+${pointsEarned.toFixed(1)} Punkte)`;
+                feedbackEl.className = 'mt-4 text-center font-medium text-lg text-yellow-400';
+            }
+            
+            // Immer die korrekte Lösung zum Vergleichen anzeigen
+            solutionDisplayEl.textContent = currentSolution;
+            correctSolutionContainerEl.classList.remove('hidden');
+        }
+
+        /**
+         * Generiert und löst den Download des PDF-Zertifikats aus.
+         */
+        function downloadCertificate() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(22);
+            doc.text("Zertifikat", 105, 30, { align: 'center' });
+
+            doc.setFontSize(14);
+            doc.text("Hiermit wird bestätigt,", 105, 50, { align: 'center' });
+            doc.text("dass die Übung zu Anschriftenfeldern (DIN 5008)", 105, 60, { align: 'center' });
+            doc.text(`mit ${score.toFixed(1)} Punkten erfolgreich bestanden wurde.`, 105, 70, { align: 'center' });
+
+            const today = new Date().toLocaleDateString('de-DE');
+            doc.text(`Datum: ${today}`, 105, 90, { align: 'center' });
+
+            doc.save("Zertifikat-DIN5008.pdf");
+        }
+
+
+        // --- EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', generateTask); // Erste Aufgabe beim Laden generieren
+        newTaskButton.addEventListener('click', generateTask);
+        checkButton.addEventListener('click', checkSolution);
+        certButton.addEventListener('click', downloadCertificate);
+
+    </script>
+</body>
+</html>
