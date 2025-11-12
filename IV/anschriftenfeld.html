@@ -211,6 +211,17 @@
         }
 
         /**
+         * Mischt ein Array (Fisher-Yates-Algorithmus)
+         * @param {Array} array Das zu mischende Array
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        /**
          * Generiert eine zufällige 5-stellige PLZ
          */
         function generatePLZ() {
@@ -279,6 +290,7 @@
 
         /**
          * Generiert eine neue Aufgabe und die dazugehörige Lösung.
+         * NEU: Erstellt Textbausteine und mischt diese.
          */
         function generateTask() {
             // Reset
@@ -288,9 +300,8 @@
             checkButton.disabled = false;
             
             let solutionLines = [];
-            let taskData = {};
-            let taskText = "";
-
+            let taskTextSnippets = []; // Array für gemischte Textbausteine
+            
             const isCompany = Math.random() > 0.4; // 60% Firmen, 40% Privat
 
             // Zufällige Basisdaten
@@ -311,35 +322,44 @@
                 const firmaSuffix = getRandomElement(firmenSuffixe);
                 const firmenName = `${firmaPraefix} ${nachname} ${firmaSuffix}`;
                 
-                // Aufbau der Lösung (mit "Herrn" oder "Frau")
+                // Aufbau der LÖSUNG (korrekte Reihenfolge)
                 solutionLines.push(firmenName);
                 solutionLines.push(`${anrede} ${vollerName}`);
                 solutionLines.push(`${strasse} ${hausnummer}`);
                 solutionLines.push(`${plz} ${stadt}`);
 
-                // Aufbau des Aufgabentexts
+                // Aufbau des AUFGABENTEXTS (Textbausteine für Mischen)
                 // Grammatikalische Korrektur: "Herrn" (Lösung) vs. "Herr" (Aufgabentext)
                 let anredeText = (anrede === "Herrn") ? "Herr" : "Frau";
-                taskText = `Erstelle das Anschriftenfeld für einen Brief an die Firma ${firmenName}. Dein Ansprechpartner ist ${anredeText} ${vollerName}. Die Firma sitzt in der ${strasse} ${hausnummer} in ${plz} ${stadt}.`;
+                
+                taskTextSnippets.push(`Du schreibst einen Brief an die Firma ${firmenName}.`);
+                taskTextSnippets.push(`Als Ansprechpartner vor Ort ist ${anredeText} ${vollerName} zuständig.`);
+                taskTextSnippets.push(`Die Postleitzahl des Unternehmens ist ${plz}.`);
+                taskTextSnippets.push(`Du findest die Büros in ${stadt} unter der Adresse: ${strasse} ${hausnummer}.`);
 
             } else {
                 // --- PRIVATANSCHRIFT ---
                 
-                // Aufbau der Lösung
-                // Anrede kommt auf *eigene* Zeile
+                // Aufbau der LÖSUNG (korrekte Reihenfolge)
                 solutionLines.push(anrede);
                 solutionLines.push(vollerName);
                 solutionLines.push(`${strasse} ${hausnummer}`);
                 solutionLines.push(`${plz} ${stadt}`);
 
-                // Aufbau des Aufgabentexts
-                // Hier ist "an Herrn..." (Akkusativ) korrekt.
-                taskText = `Du schreibst einen privaten Brief an ${anrede} ${vollerName}. Die Adresse lautet: ${strasse} ${hausnummer}, ${plz} ${stadt}.`;
+                // Aufbau des AUFGABENTEXTS (Textbausteine für Mischen)
+                taskTextSnippets.push(`Ein privater Brief soll an ${anrede} ${vollerName} gehen.`);
+                taskTextSnippets.push(`Die Person wohnt in der ${strasse} ${hausnummer}.`);
+                taskTextSnippets.push(`Der Wohnort ist ${stadt}.`);
+                taskTextSnippets.push(`Die zugehörige Postleitzahl lautet ${plz}.`);
             }
+
+            // --- Bausteine mischen und zu einem Text verbinden ---
+            shuffleArray(taskTextSnippets);
+            const taskText = taskTextSnippets.join(' '); // Zu einem Fließtext verbinden
 
             // Speichern und anzeigen
             currentSolution = solutionLines.join('\n');
-            displayTask(taskText); // Übergibt den Fließtext
+            displayTask(taskText); // Übergibt den gemischten Fließtext
         }
 
         /**
