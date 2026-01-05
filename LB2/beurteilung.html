@@ -134,6 +134,39 @@
             background-color: #004a80;
         }
 
+        .format-selection {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #005A9C;
+        }
+
+        .format-selection label {
+            font-weight: bold;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+
+        .format-selection input[type="radio"] {
+            margin-right: 5px;
+            cursor: pointer;
+        }
+
+        .video-only {
+            display: table-row;
+        }
+
+        .video-only.hidden {
+            display: none;
+        }
+
+        @media print {
+            .format-selection {
+                display: none;
+            }
+        }
+
         @media print {
             /* --- Extrem kompakte Druckoptimierungen --- */
             body {
@@ -227,6 +260,12 @@
         </div>
     </div>
 
+    <div class="format-selection">
+        <label>Abgegebenes Format:</label>
+        <label><input type="radio" name="format" value="video" onchange="toggleVideoQuality()" checked> Video</label>
+        <label><input type="radio" name="format" value="podcast" onchange="toggleVideoQuality()"> Podcast</label>
+    </div>
+
     <h3>Teil A: Schriftliche Rezension (max. 35 Punkte)</h3>
     <table>
         <thead>
@@ -244,7 +283,7 @@
             </tr>
             <tr>
                 <td colspan="3" class="criteria-description">
-                    Alle geforderten Abschnitte (a-f) sind vorhanden und klar erkennbar. Der Text ist sauber strukturiert und sprachlich angemessen für das gewählte Format. Alle Dokumente oder Datei[...]
+                    Alle geforderten Abschnitte (a-f) sind vorhanden und klar erkennbar. Der Text ist sauber strukturiert und sprachlich angemessen für das gewählte Format. Ein Drehbuch/Skript wurde erstellt. Alle Dokumente oder Dateien wurden rechtzeitig und im geforderten Dateiformat abgegeben.
                 </td>
             </tr>
             <tr>
@@ -254,7 +293,7 @@
             </tr>
              <tr>
                 <td colspan="3" class="criteria-description">
-                   Der Steckbrief ist vollständig und korrekt. Gameplay und Story werden detailliert, verständlich und nachvollziehbar beschrieben. 
+                   Der Steckbrief ist vollständig und korrekt (Name, USK, Genre, Zielgruppe). Gameplay und Story werden detailliert, verständlich und nachvollziehbar beschrieben. 
                 </td>
             </tr>
             <tr>
@@ -264,7 +303,7 @@
             </tr>
              <tr>
                 <td colspan="3" class="criteria-description">
-                    Die Analyse der Spielmechaniken nutzt Fachbegriffe korrekt. Die Auseinandersetzung mit Chancen und Risiken ist differenziert und gut begründet. Motivatonssysteme wurden benannt und korrekt bezeichnet
+                    Die Analyse der Spielmechaniken nutzt Fachbegriffe korrekt. Es wurden 2-3 wichtige Motivationssysteme benannt und korrekt bezeichnet. Die Auseinandersetzung mit Chancen und Risiken ist differenziert und gut begründet.
                 </td>
             </tr>
             <tr>
@@ -310,14 +349,14 @@
                     Kein störendes Rauschen, Hall oder Hintergrundgeräusche.  Aufnahme ist professionell und ohne technische Mängel.
                 </td>
             </tr>
-            <tr>
-                <td><b>7. Videoqualität (falls Video)</b></td>
+            <tr class="video-only" id="video-quality-row">
+                <td><b>7. Videoqualität</b></td>
                 <td class="max-points-cell">2</td>
-                <td class="points-cell"><input class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
+                <td class="points-cell"><input class="point-input-b" id="video-quality-input" type="number" min="0" max="2" oninput="calculateResults()"></td>
             </tr>
-            <tr>
+            <tr class="video-only" id="video-quality-desc">
                 <td colspan="3" class="criteria-description">
-                    Bildqualität ist ausreichend scharf und gut belichtet. Bildausschnitt ist angemessen gewählt.  (Bei reinem Podcast: volle Punktzahl)
+                    Bildqualität ist ausreichend scharf und gut belichtet. Bildausschnitt ist angemessen gewählt.
                 </td>
             </tr>
             <tr>
@@ -427,9 +466,25 @@
         document.getElementById('date-field').value = `${day}.${month}.${year}`;
     }
 
+    function toggleVideoQuality() {
+        const format = document.querySelector('input[name="format"]:checked').value;
+        const videoRows = document.querySelectorAll('.video-only');
+        const videoInput = document.getElementById('video-quality-input');
+        
+        if (format === 'podcast') {
+            videoRows.forEach(row => row.classList.add('hidden'));
+            videoInput.value = 2; // Volle Punktzahl bei Podcast
+        } else {
+            videoRows.forEach(row => row.classList.remove('hidden'));
+            videoInput.value = 0; // Bei Video muss bewertet werden
+        }
+        calculateResults();
+    }
+
     window.onload = function() {
         calculateResults();
         setCurrentDate();
+        toggleVideoQuality(); // Initial state setzen
     };
 </script>
 
