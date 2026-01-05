@@ -64,6 +64,11 @@
             text-align: center;
             font-weight: bold;
         }
+        input[type="number"]:disabled {
+            background-color: #e9ecef;
+            color: #28a745;
+            font-weight: bold;
+        }
         .student-info {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -74,6 +79,51 @@
             font-weight: bold;
             display: block;
             margin-bottom: 5px;
+        }
+        .format-selection {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #005A9C;
+        }
+        .format-selection h3 {
+            margin-top: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .radio-group {
+            display: flex;
+            gap: 30px;
+            margin-top: 15px;
+        }
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .radio-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .radio-option label {
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 0;
+        }
+        .auto-filled-row {
+            background-color: #d4edda !important;
+            transition: background-color 0.3s ease;
+        }
+        .auto-filled-row td {
+            position: relative;
+        }
+        .auto-filled-row td:first-child::before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 5px;
         }
         .summary-table {
             margin-top: 40px;
@@ -135,25 +185,24 @@
         }
 
         @media print {
-            /* --- Extrem kompakte Druckoptimierungen --- */
             body {
                 background-color: #fff;
                 padding: 0;
                 margin: 0;
-                font-size: 8.5pt; /* Sehr kleine Basisschriftgröße */
+                font-size: 8.5pt;
                 line-height: 1.2;
             }
             .container {
                 box-shadow: none;
                 border: none;
                 margin: 0;
-                padding: 0; /* Kein Innenabstand */
+                padding: 0;
                 width: 100%;
                 max-width: 100%;
                 border-radius: 0;
             }
             #print-button {
-                display: none; /* Druck-Button ausblenden */
+                display: none;
             }
             input, textarea {
                 border: none !important;
@@ -166,18 +215,17 @@
             }
             h1, h2, h3 {
                 page-break-after: avoid;
-                margin-top: 8px; /* Stark reduzierte Abstände */
+                margin-top: 8px;
                 margin-bottom: 2px;
                 padding-bottom: 2px;
             }
             h1 { font-size: 14pt; }
             h3 { font-size: 10pt; }
-
             table {
                 margin-top: 5px;
             }
             th, td {
-                padding: 3px; /* Stark reduzierter Zellenabstand */
+                padding: 3px;
             }
             .criteria-description {
                 font-size: 0.9em;
@@ -190,7 +238,7 @@
                 margin-bottom: 10px;
             }
             textarea {
-                height: 40px !important; /* Sehr kleine Höhe für Feedbackfelder */
+                height: 40px !important;
             }
             .feedback-section {
                 margin-top: 10px;
@@ -199,10 +247,17 @@
                 margin-top: 15px;
             }
             .signature-line {
-                margin-top: 15px; /* Geringerer Abstand für Unterschrift */
+                margin-top: 15px;
             }
             table, .feedback-section {
-                page-break-inside: avoid; /* Seitenumbrüche in Tabellen verhindern */
+                page-break-inside: avoid;
+            }
+            .format-selection {
+                margin-bottom: 10px;
+            }
+            .auto-filled-row {
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
             }
         }
     </style>
@@ -224,6 +279,20 @@
         <div class="info-item">
             <label for="game-name">Getestetes Spiel:</label>
             <input type="text" id="game-name" placeholder="z.B. Minecraft">
+        </div>
+    </div>
+
+    <div class="format-selection">
+        <h3>Eingereichte Format:</h3>
+        <div class="radio-group">
+            <div class="radio-option">
+                <input type="radio" id="format-video" name="format" value="video" onchange="handleFormatChange()" checked>
+                <label for="format-video">📹 Video</label>
+            </div>
+            <div class="radio-option">
+                <input type="radio" id="format-podcast" name="format" value="podcast" onchange="handleFormatChange()">
+                <label for="format-podcast">🎙️ Podcast</label>
+            </div>
         </div>
     </div>
 
@@ -310,14 +379,14 @@
                     Kein störendes Rauschen, Hall oder Hintergrundgeräusche. Aufnahme ist professionell und ohne technische Mängel.
                 </td>
             </tr>
-            <tr>
-                <td><b>7. Videoqualität (falls Video)</b></td>
+            <tr id="video-quality-row">
+                <td><b>7. Videoqualität</b> <span style="font-size: 0.9em; color: #6c757d;">(nur bei Video)</span></td>
                 <td class="max-points-cell">2</td>
-                <td class="points-cell"><input class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
+                <td class="points-cell"><input id="video-quality-input" class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
             </tr>
             <tr>
                 <td colspan="3" class="criteria-description">
-                    Bildqualität ist ausreichend scharf und gut belichtet. Bildausschnitt ist angemessen gewählt. (Bei reinem Podcast: volle Punktzahl)
+                    Bildqualität ist ausreichend scharf und gut belichtet. Bildausschnitt ist angemessen gewählt. (Bei Podcast: automatisch 2 Punkte)
                 </td>
             </tr>
             <tr>
@@ -391,6 +460,26 @@
 </div>
 
 <script>
+    function handleFormatChange() {
+        const videoQualityInput = document.getElementById('video-quality-input');
+        const videoQualityRow = document.getElementById('video-quality-row');
+        const isPodcast = document.getElementById('format-podcast').checked;
+        
+        if (isPodcast) {
+            // Bei Podcast: automatisch 2 Punkte und Feld deaktivieren
+            videoQualityInput.value = 2;
+            videoQualityInput.disabled = true;
+            videoQualityRow.classList.add('auto-filled-row');
+        } else {
+            // Bei Video: Feld aktivieren und zurücksetzen
+            videoQualityInput.value = '';
+            videoQualityInput.disabled = false;
+            videoQualityRow.classList.remove('auto-filled-row');
+        }
+        
+        calculateResults();
+    }
+
     function calculateResults() {
         let sumA = 0;
         document.querySelectorAll('.point-input-a').forEach(input => {
@@ -437,6 +526,7 @@
     window.onload = function() {
         calculateResults();
         setCurrentDate();
+        handleFormatChange(); // Initial setup
     };
 </script>
 
