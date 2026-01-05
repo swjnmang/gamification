@@ -3,652 +3,537 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixel-Probe Beurteilungsformular</title>
+    <title>Interaktiver Beurteilungsbogen - Spieletest</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
             padding: 20px;
         }
-
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-top: 5px solid #005A9C;
         }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px;
+        h1, h2, h3 {
+            color: #005A9C;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            border-bottom: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        td.points-cell {
+            width: 80px;
             text-align: center;
         }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        td.max-points-cell {
+            width: 100px;
+            text-align: center;
         }
-
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
+        input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
-
-        .content {
-            padding: 40px;
+        input[type="number"] {
+            text-align: center;
+            font-weight: bold;
         }
-
-        .info-section {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            border-left: 5px solid #667eea;
-        }
-
-        .info-grid {
+        .student-info {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            margin-top: 20px;
+            margin-bottom: 30px;
         }
-
-        .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-
         .info-item label {
-            font-weight: 600;
-            color: #667eea;
-            margin-bottom: 8px;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
         }
-
-        .info-item input {
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: all 0.3s;
-        }
-
-        .info-item input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .evaluation-section {
-            margin-bottom: 40px;
-        }
-
-        .section-title {
-            font-size: 1.8em;
-            color: #333;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
+        .format-selection {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 3px solid #005A9C;
         }
-
-        .section-points {
-            font-size: 0.8em;
-            color: #667eea;
+        .format-selection label {
+            font-weight: bold;
+            margin: 0;
+        }
+        .radio-group {
+            display: flex;
+            gap: 20px;
+        }
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .radio-option label {
+            font-size: 1em;
+            cursor: pointer;
+            margin: 0;
             font-weight: normal;
         }
-
-        .criteria-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .hidden-row {
+            display: none;
         }
-
-        .criteria-table thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .criteria-table th {
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.9em;
-            letter-spacing: 0.5px;
-        }
-
-        .criteria-table td {
-            padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .criteria-table tbody tr {
-            background: white;
-            transition: all 0.3s;
-        }
-
-        .criteria-table tbody tr:hover {
-            background: #f8f9fa;
-            transform: scale(1.01);
-        }
-
-        .criteria-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .criterion-name {
-            font-weight: 500;
-            color: #333;
-        }
-
-        .criterion-description {
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .points-input {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .points-input input {
-            width: 80px;
-            padding: 8px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .points-input input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .points-input input.invalid {
-            border-color: #e74c3c;
-            background: #ffe5e5;
-        }
-
-        .max-points {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .comments-section {
-            margin-top: 20px;
-        }
-
-        .comments-section label {
-            display: block;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .comments-section textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            font-family: inherit;
-            resize: vertical;
-            transition: all 0.3s;
-        }
-
-        .comments-section textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .summary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-top: 30px;
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .summary-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-
-        .summary-item label {
-            display: block;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-            opacity: 0.9;
-        }
-
-        .summary-item .value {
-            font-size: 2em;
+        .summary-table {
+            margin-top: 40px;
+            font-size: 1.2em;
             font-weight: bold;
         }
-
-        .actions {
+        .summary-table td {
+            padding: 15px;
+        }
+        #final-grade {
+            color: #E67E22;
+            font-size: 1.5em;
+        }
+        .feedback-section {
+            margin-top: 40px;
+        }
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        .criteria-description {
+            font-style: italic;
+            color: #555;
+            font-size: 0.9em;
+            padding-top: 0;
+            border-top: none;
+        }
+        .signature-section {
+            margin-top: 60px;
             display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            flex-wrap: wrap;
+            justify-content: space-between;
         }
-
-        .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1em;
+        .signature-item {
+            width: 45%;
+        }
+        .signature-item label {
+            font-weight: bold;
+        }
+        .signature-line {
+            border-bottom: 1px solid #333;
+            margin-top: 40px;
+        }
+        #print-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
             font-weight: 600;
+            color: #ffffff;
+            background-color: #005A9C;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            margin-top: 40px;
+            transition: background-color 0.3s;
         }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            flex: 1;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-            flex: 1;
-        }
-
-        .btn-secondary:hover {
-            background: #667eea;
-            color: white;
+        #print-button:hover {
+            background-color: #004a80;
         }
 
         @media print {
             body {
-                background: white;
+                background-color: #fff;
                 padding: 0;
+                margin: 0;
+                font-size: 8.5pt;
+                line-height: 1.2;
             }
-
             .container {
                 box-shadow: none;
+                border: none;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+                border-radius: 0;
             }
-
-            .actions {
+            #print-button {
                 display: none;
             }
-
-            .criteria-table tbody tr:hover {
-                transform: none;
+            input, textarea {
+                border: none !important;
+                background-color: #fff !important;
+                box-shadow: none !important;
+                resize: none;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                padding: 2px !important;
             }
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.8em;
+            h1, h2, h3 {
+                page-break-after: avoid;
+                margin-top: 8px;
+                margin-bottom: 2px;
+                padding-bottom: 2px;
             }
-
-            .content {
-                padding: 20px;
+            h1 { font-size: 14pt; }
+            h3 { font-size: 10pt; }
+            table {
+                margin-top: 5px;
             }
-
-            .info-grid {
-                grid-template-columns: 1fr;
+            th, td {
+                padding: 3px;
             }
-
-            .summary-grid {
-                grid-template-columns: 1fr;
+            .criteria-description {
+                font-size: 0.9em;
+                line-height: 1.1;
             }
-
-            .actions {
-                flex-direction: column;
+            .summary-table td {
+                padding: 4px;
             }
-        }
-
-        .max-points-cell {
-            text-align: center;
-            font-weight: 600;
-            color: #667eea;
+            .student-info {
+                margin-bottom: 10px;
+            }
+            textarea {
+                height: 40px !important;
+            }
+            .feedback-section {
+                margin-top: 10px;
+            }
+            .signature-section {
+                margin-top: 15px;
+            }
+            .signature-line {
+                margin-top: 15px;
+            }
+            table, .feedback-section {
+                page-break-inside: avoid;
+            }
+            .format-selection {
+                margin-bottom: 8px;
+                padding: 5px 10px;
+            }
+            .hidden-row {
+                display: none !important;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🎮 Pixel-Probe Beurteilungsformular</h1>
-            <p>Bewertung der schriftlichen Rezension und Präsentation</p>
+
+<div class="container">
+    <h1>Beurteilungsbogen: Spieletest „Pixel-Probe"</h1>
+
+    <div class="student-info">
+        <div class="info-item">
+            <label for="student-name">Name(n) der Schüler / der Schülerinnen:</label>
+            <textarea id="student-name" placeholder="Max Mustermann&#10;Erika Mustermann" rows="3"></textarea>
         </div>
+        <div class="info-item">
+            <label for="student-class">Klasse:</label>
+            <input type="text" id="student-class" placeholder="10b">
+        </div>
+        <div class="info-item">
+            <label for="game-name">Getestetes Spiel:</label>
+            <input type="text" id="game-name" placeholder="z.B. Minecraft">
+        </div>
+    </div>
 
-        <div class="content">
-            <div class="info-section">
-                <h2 style="color: #667eea; margin-bottom: 20px;">📋 Allgemeine Informationen</h2>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label for="studentName">Name der/des Studierenden</label>
-                        <input type="text" id="studentName" placeholder="Vor- und Nachname">
-                    </div>
-                    <div class="info-item">
-                        <label for="gameName">Name des Spiels</label>
-                        <input type="text" id="gameName" placeholder="Name des bewerteten Spiels">
-                    </div>
-                    <div class="info-item">
-                        <label for="evaluatorName">Name der/des Bewertenden</label>
-                        <input type="text" id="evaluatorName" placeholder="Ihr Name">
-                    </div>
-                    <div class="info-item">
-                        <label for="evaluationDate">Datum</label>
-                        <input type="date" id="evaluationDate">
-                    </div>
-                </div>
+    <div class="format-selection">
+        <label>Eingereichte Format:</label>
+        <div class="radio-group">
+            <div class="radio-option">
+                <input type="radio" id="format-video" name="format" value="video" onchange="handleFormatChange()" checked>
+                <label for="format-video">📹 Video</label>
             </div>
-
-            <div class="evaluation-section">
-                <h2 class="section-title">
-                    Teil A: Schriftliche Rezension (max. 35 Punkte)
-                    <span class="section-points" id="totalPointsA">0 / 35 Punkte</span>
-                </h2>
-
-                <table class="criteria-table">
-                    <thead>
-                        <tr>
-                            <th>Kriterium</th>
-                            <th style="width: 120px; text-align: center;">Max. Punkte</th>
-                            <th style="width: 150px; text-align: center;">Erreichte Punkte</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div class="criterion-name">1. Struktur und Aufbau</div>
-                                <div class="criterion-description">Klare Gliederung, logischer Aufbau, roter Faden erkennbar</div>
-                            </td>
-                            <td class="max-points-cell">5</td>
-                            <td>
-                                <div class="points-input">
-                                    <input type="number" class="points-a" min="0" max="5" step="0.5" value="0" data-max="5">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="criterion-name">2. Inhaltliche Tiefe</div>
-                                <div class="criterion-description">Detaillierte Analyse, fundierte Argumente, kritische Auseinandersetzung</div>
-                            </td>
-                            <td class="max-points-cell">10</td>
-                            <td>
-                                <div class="points-input">
-                                    <input type="number" class="points-a" min="0" max="10" step="0.5" value="0" data-max="10">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="criterion-name">3. Fachliche Korrektheit</div>
-                                <div class="criterion-description">Korrekte Verwendung von Fachbegriffen, sachlich richtige Darstellung</div>
-                            </td>
-                            <td class="max-points-cell">10</td>
-                            <td>
-                                <div class="points-input">
-                                    <input type="number" class="points-a" min="0" max="10" step="0.5" value="0" data-max="10">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="criterion-name">4. Sprachliche Qualität</div>
-                                <div class="criterion-description">Rechtschreibung, Grammatik, Ausdruck, Lesbarkeit</div>
-                            </td>
-                            <td class="max-points-cell">10</td>
-                            <td>
-                                <div class="points-input">
-                                    <input type="number" class="points-a" min="0" max="10" step="0.5" value="0" data-max="10">
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="comments-section">
-                    <label for="commentsA">Kommentare zu Teil A:</label>
-                    <textarea id="commentsA" placeholder="Ihre Anmerkungen zur schriftlichen Rezension..."></textarea>
-                </div>
-            </div>
-
-            <div class="evaluation-section">
-                <h2 class="section-title">
-                    Teil B: Präsentation (max. 30 Punkte)
-                    <span class="section-points" id="totalPointsB">0 / 30 Punkte</span>
-                </h2>
-
-                <table class="criteria-table">
-                    <thead>
-                        <tr>
-                            <th>Kriterium</th>
-                            <th style="width: 120px; text-align: center;">Max. Punkte</th>
-                            <th style="width: 150px; text-align: center;">Erreichte Punkte</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div class="criterion-name">1. Inhalt und Struktur</div>
-                                <div class="criterion-description">Klarer Aufbau, vollständige Darstellung der wichtigsten Punkte</div>
-                            </td>
-                            <td class="max-points-cell">10</td>
-                            <td>
-                                <div class="points-input">
-                                    <input type="number" class="points-b" min="0" max="10" step="0.5" value="0" data-max="10">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="criterion-name">2. Visualisierung</div>
-                                <div class="criterion-description">Qualität der Folien, Einsatz von Bildern/Videos, Übersichtlichkeit</div>
-                            </td>
-                            <td class="max-points-cell">10</td>
-                            <td>
-                                <div class="points-input">
-                                    <input type="number" class="points-b" min="0" max="10" step="0.5" value="0" data-max="10">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="criterion-name">3. Vortragsstil</div>
-                                <div class="criterion-description">Freies Sprechen, Körpersprache, Stimme, Blickkontakt, Zeitmanagement</div>
-                            </td>
-                            <td class="max-points-cell">10</td>
-                            <td>
-                                <div class="points-input">
-                                    <input type="number" class="points-b" min="0" max="10" step="0.5" value="0" data-max="10">
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="comments-section">
-                    <label for="commentsB">Kommentare zu Teil B:</label>
-                    <textarea id="commentsB" placeholder="Ihre Anmerkungen zur Präsentation..."></textarea>
-                </div>
-            </div>
-
-            <div class="summary">
-                <h2 style="margin-bottom: 10px;">📊 Zusammenfassung</h2>
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <label>Teil A (Schriftlich)</label>
-                        <div class="value" id="summaryA">0 / 35</div>
-                    </div>
-                    <div class="summary-item">
-                        <label>Teil B (Präsentation)</label>
-                        <div class="value" id="summaryB">0 / 30</div>
-                    </div>
-                    <div class="summary-item">
-                        <label>Gesamtpunktzahl</label>
-                        <div class="value" id="summaryTotal">0 / 65</div>
-                    </div>
-                    <div class="summary-item">
-                        <label>Prozent</label>
-                        <div class="value" id="summaryPercent">0%</div>
-                    </div>
-                </div>
-
-                <div class="comments-section" style="margin-top: 20px;">
-                    <label for="finalComments" style="color: white;">Abschließende Bemerkungen:</label>
-                    <textarea id="finalComments" placeholder="Gesamteinschätzung, Stärken, Verbesserungspotenzial..."></textarea>
-                </div>
-            </div>
-
-            <div class="actions">
-                <button class="btn btn-primary" onclick="window.print()">🖨️ Drucken / PDF speichern</button>
-                <button class="btn btn-secondary" onclick="resetForm()">🔄 Formular zurücksetzen</button>
+            <div class="radio-option">
+                <input type="radio" id="format-podcast" name="format" value="podcast" onchange="handleFormatChange()">
+                <label for="format-podcast">🎙️ Podcast</label>
             </div>
         </div>
     </div>
 
-    <script>
-        // Set today's date
-        document.getElementById('evaluationDate').valueAsDate = new Date();
+    <h3>Teil A: Schriftliche Rezension (max. 70 Punkte)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Kriterium</th>
+                <th class="max-points-cell">Max. Punkte</th>
+                <th class="points-cell">Punkte</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><b>1. Formale Kriterien & Vollständigkeit</b></td>
+                <td class="max-points-cell">10</td>
+                <td class="points-cell"><input class="point-input-a" type="number" min="0" max="10" oninput="calculateResults()"></td>
+            </tr>
+            <tr>
+                <td colspan="3" class="criteria-description">
+                    Alle geforderten Abschnitte (a-e) sind vorhanden und klar erkennbar. Der Text ist sauber strukturiert und sprachlich angemessen für das gewählte Format. Alle Dokumente oder Datei[...]
+                </td>
+            </tr>
+            <tr>
+                <td><b>2. Inhaltliche Darstellung (Steckbrief, Gameplay & Story)</b></td>
+                <td class="max-points-cell">20</td>
+                <td class="points-cell"><input class="point-input-a" type="number" min="0" max="20" oninput="calculateResults()"></td>
+            </tr>
+             <tr>
+                <td colspan="3" class="criteria-description">
+                   Der Steckbrief ist vollständig und korrekt. Gameplay und Story werden detailliert, verständlich und nachvollziehbar beschrieben.
+                </td>
+            </tr>
+            <tr>
+                <td><b>3. Analytische Tiefe (Spielmechaniken, Chancen & Risiken)</b></td>
+                <td class="max-points-cell">20</td>
+                <td class="points-cell"><input class="point-input-a" type="number" min="0" max="20" oninput="calculateResults()"></td>
+            </tr>
+             <tr>
+                <td colspan="3" class="criteria-description">
+                    Die Analyse der Spielmechaniken nutzt Fachbegriffe korrekt. Die Auseinandersetzung mit Chancen und Risiken ist differenziert und gut begründet.
+                </td>
+            </tr>
+            <tr>
+                <td><b>4. Bewertung & Begründung</b></td>
+                <td class="max-points-cell">20</td>
+                <td class="points-cell"><input class="point-input-a" type="number" min="0" max="20" oninput="calculateResults()"></td>
+            </tr>
+             <tr>
+                <td colspan="3" class="criteria-description">
+                   Die Bewertung ist eindeutig. Die Begründung ist logisch, schlüssig und leitet sich nachvollziehbar aus der Analyse ab.
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-        // Calculate points for Teil A
-        function calculatePointsA() {
-            const inputs = document.querySelectorAll('.points-a');
-            let sum = 0;
-            let allValid = true;
+    <h3 id="part-b-title">Teil B: Podcast / Video (max. 10 Punkte)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Kriterium</th>
+                <th class="max-points-cell">Max. Punkte</th>
+                <th class="points-cell">Punkte</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><b>5. Audioqualität - Stimme</b></td>
+                <td class="max-points-cell">2</td>
+                <td class="points-cell"><input class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
+            </tr>
+            <tr>
+                <td colspan="3" class="criteria-description">
+                    Die Stimme ist klar und deutlich verständlich. Lautstärke ist angemessen und konstant.
+                </td>
+            </tr>
+            <tr>
+                <td><b>6. Audioqualität - Hintergrund</b></td>
+                <td class="max-points-cell">2</td>
+                <td class="points-cell"><input class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
+            </tr>
+            <tr>
+                <td colspan="3" class="criteria-description">
+                    Kein störendes Rauschen, Hall oder Hintergrundgeräusche. Aufnahme ist professionell und ohne technische Mängel.
+                </td>
+            </tr>
+            <tr id="video-quality-row" class="video-only-row">
+                <td><b>7. Videoqualität</b></td>
+                <td class="max-points-cell">2</td>
+                <td class="points-cell"><input id="video-quality-input" class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
+            </tr>
+            <tr id="video-quality-desc-row" class="video-only-row">
+                <td colspan="3" class="criteria-description">
+                    Bildqualität ist ausreichend scharf und gut belichtet. Bildausschnitt ist angemessen gewählt.
+                </td>
+            </tr>
+            <tr>
+                <td><b><span id="criterion-number-8">8</span>. Inhaltliche Umsetzung</b></td>
+                <td class="max-points-cell">2</td>
+                <td class="points-cell"><input class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
+            </tr>
+            <tr>
+                <td colspan="3" class="criteria-description">
+                    Die wichtigsten Erkenntnisse werden zusammengefasst. Die Bewertung des Spiels wird klar kommuniziert.
+                </td>
+            </tr>
+            <tr>
+                <td><b><span id="criterion-number-9">9</span>. Sprechweise & Engagement</b></td>
+                <td class="max-points-cell">2</td>
+                <td class="points-cell"><input class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
+            </tr>
+            <tr>
+                <td colspan="3" class="criteria-description">
+                    Der Vortrag ist flüssig und lebendig. Die Sprechweise ist motiviert und ansprechend für Zuhörer/Zuschauer.
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-            inputs.forEach(input => {
-                const value = parseFloat(input.value) || 0;
-                const max = parseFloat(input.dataset.max);
+    <h3>Gesamtergebnis</h3>
+    <table class="summary-table">
+        <tbody>
+            <tr>
+                <td>Zwischensumme Teil A</td>
+                <td id="sum-a">0 / 70 Punkte</td>
+            </tr>
+            <tr>
+                <td>Zwischensumme Teil B</td>
+                <td id="sum-b">0 / 10 Punkte</td>
+            </tr>
+            <tr>
+                <td><b>Gesamtpunktzahl</b></td>
+                <td id="total-points"><b>0 / 80 Punkte</b></td>
+            </tr>
+            <tr>
+                <td>Prozent</td>
+                <td id="percentage">0 %</td>
+            </tr>
+            <tr>
+                <td><b>Note</b></td>
+                <td id="final-grade"><b>-</b></td>
+            </tr>
+        </tbody>
+    </table>
 
-                if (value > max) {
-                    input.classList.add('invalid');
-                    allValid = false;
-                } else {
-                    input.classList.remove('invalid');
-                    sum += value;
-                }
+    <div class="feedback-section">
+        <h3>Positives Feedback:</h3>
+        <textarea placeholder="Was war besonders gut?"></textarea>
+        <h3>Verbesserungsvorschläge:</h3>
+        <textarea placeholder="Wo gibt es noch Potenzial?"></textarea>
+    </div>
+
+    <div class="signature-section">
+        <div class="signature-item">
+            <label>Datum:</label>
+            <input type="text" id="date-field" readonly style="border: none; background: transparent; padding: 0; margin-top: 10px;">
+        </div>
+        <div class="signature-item">
+            <label>Unterschrift:</label>
+            <div class="signature-line"></div>
+        </div>
+    </div>
+
+    <button id="print-button" onclick="window.print()">Beurteilung Drucken</button>
+</div>
+
+<script>
+    function handleFormatChange() {
+        const videoQualityInput = document.getElementById('video-quality-input');
+        const videoOnlyRows = document.querySelectorAll('.video-only-row');
+        const isPodcast = document.getElementById('format-podcast').checked;
+        const partBTitle = document.getElementById('part-b-title');
+        const sumBDisplay = document.getElementById('sum-b');
+        const criterionNumber8 = document.getElementById('criterion-number-8');
+        const criterionNumber9 = document.getElementById('criterion-number-9');
+        
+        if (isPodcast) {
+            // Bei Podcast: Videoqualität-Zeilen ausblenden
+            videoOnlyRows.forEach(row => {
+                row.classList.add('hidden-row');
             });
-
-            document.getElementById('totalPointsA').textContent = `${sum} / 35 Punkte`;
-            document.getElementById('summaryA').textContent = `${sum} / 35`;
-            
-            calculateTotal();
-            return sum;
-        }
-
-        // Calculate points for Teil B
-        function calculatePointsB() {
-            const inputs = document.querySelectorAll('.points-b');
-            let sum = 0;
-            let allValid = true;
-
-            inputs.forEach(input => {
-                const value = parseFloat(input.value) || 0;
-                const max = parseFloat(input.dataset.max);
-
-                if (value > max) {
-                    input.classList.add('invalid');
-                    allValid = false;
-                } else {
-                    input.classList.remove('invalid');
-                    sum += value;
-                }
+            videoQualityInput.value = 0; // Wert auf 0 setzen
+            partBTitle.textContent = 'Teil B: Podcast (max. 8 Punkte)';
+            criterionNumber8.textContent = '7';
+            criterionNumber9.textContent = '8';
+        } else {
+            // Bei Video: Videoqualität-Zeilen anzeigen
+            videoOnlyRows.forEach(row => {
+                row.classList.remove('hidden-row');
             });
-
-            document.getElementById('totalPointsB').textContent = `${sum} / 30 Punkte`;
-            document.getElementById('summaryB').textContent = `${sum} / 30`;
-            
-            calculateTotal();
-            return sum;
+            videoQualityInput.value = '';
+            partBTitle.textContent = 'Teil B: Video (max. 10 Punkte)';
+            criterionNumber8.textContent = '8';
+            criterionNumber9.textContent = '9';
         }
+        
+        calculateResults();
+    }
 
-        // Calculate total
-        function calculateTotal() {
-            const sumA = calculatePointsA();
-            const sumB = calculatePointsB();
-            
-            // Get max points for Teil B
-            const inputsB = document.querySelectorAll('.points-b');
-            let maxPointsB = 0;
-            inputsB.forEach(input => {
-                maxPointsB += parseFloat(input.dataset.max);
-            });
-            
-            const maxPoints = 35 + maxPointsB;
-            const total = sumA + sumB;
-            const percent = maxPoints > 0 ? ((total / maxPoints) * 100).toFixed(1) : 0;
-
-            document.getElementById('summaryA').textContent = `${sumA} / 35 Punkte`;
-            document.getElementById('summaryB').textContent = `${sumB} / ${maxPointsB} Punkte`;
-            document.getElementById('summaryTotal').textContent = `${total} / ${maxPoints}`;
-            document.getElementById('summaryPercent').textContent = `${percent}%`;
-        }
-
-        // Add event listeners to all point inputs
-        document.querySelectorAll('.points-a, .points-b').forEach(input => {
-            input.addEventListener('input', calculateTotal);
+    function calculateResults() {
+        let sumA = 0;
+        document.querySelectorAll('.point-input-a').forEach(input => {
+            const max = parseInt(input.max);
+            if (parseInt(input.value) > max) input.value = max;
+            sumA += Number(input.value) || 0;
         });
 
-        // Reset form
-        function resetForm() {
-            if (confirm('Möchten Sie wirklich alle Eingaben zurücksetzen?')) {
-                document.querySelectorAll('input[type="text"], input[type="date"], input[type="number"], textarea').forEach(input => {
-                    if (input.type === 'number') {
-                        input.value = 0;
-                    } else if (input.type === 'date') {
-                        input.valueAsDate = new Date();
-                    } else {
-                        input.value = '';
-                    }
-                });
-                calculateTotal();
+        let sumB = 0;
+        document.querySelectorAll('.point-input-b').forEach(input => {
+            // Nur zählen wenn das Feld nicht in einer versteckten Zeile ist
+            const row = input.closest('tr');
+            if (!row || !row.classList.contains('hidden-row')) {
+                const max = parseInt(input.max);
+                if (parseInt(input.value) > max) input.value = max;
+                sumB += Number(input.value) || 0;
             }
-        }
+        });
 
-        // Initialize calculations
-        calculateTotal();
-    </script>
+        const isPodcast = document.getElementById('format-podcast').checked;
+        const maxPointsB = isPodcast ? 8 : 10;
+        const totalPoints = sumA + sumB;
+        const maxPoints = 70 + maxPointsB;
+        const percentage = (totalPoints / maxPoints) * 100;
+
+        document.getElementById('sum-a').innerText = `${sumA} / 70 Punkte`;
+        document.getElementById('sum-b').innerText = `${sumB} / ${maxPointsB} Punkte`;
+        document.getElementById('total-points').innerHTML = `<b>${totalPoints} / ${maxPoints} Punkte</b>`;
+        document.getElementById('percentage').innerText = `${percentage.toFixed(1)} %`;
+        document.getElementById('final-grade').innerHTML = `<b>${getGrade(percentage)}</b>`;
+    }
+
+    function getGrade(p) {
+        if (p >= 92) return "1 (Sehr gut)";
+        if (p >= 81) return "2 (Gut)";
+        if (p >= 67) return "3 (Befriedigend)";
+        if (p >= 50) return "4 (Ausreichend)";
+        if (p >= 30) return "5 (Mangelhaft)";
+        return "6 (Ungenügend)";
+    }
+
+    function setCurrentDate() {
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const year = today.getFullYear();
+        document.getElementById('date-field').value = `${day}.${month}.${year}`;
+    }
+
+    window.onload = function() {
+        calculateResults();
+        setCurrentDate();
+        handleFormatChange(); // Initial setup
+    };
+</script>
+
 </body>
 </html>
