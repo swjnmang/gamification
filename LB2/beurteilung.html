@@ -3,372 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beurteilungsbogen - Gamification Projekt</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>LB2 Beurteilung - Gamification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+        }
+        .criterion {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            border-radius: 4px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="number"] {
+            width: 100px;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        .max-points {
+            color: #666;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+            border: 2px solid #4CAF50;
+        }
+        .result h3 {
+            margin-top: 0;
+            color: #2e7d32;
+        }
+        .sum {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .grade {
+            font-size: 1.5em;
+            color: #1b5e20;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .description {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Beurteilungsbogen - Gamification Projekt</h1>
+        <h1>LB2 Beurteilung - Gamification</h1>
         
-        <div class="info-section">
-            <label for="student-name">Name der Studierenden:</label>
-            <input type="text" id="student-name" placeholder="Name eingeben">
-            
-            <label for="project-type">Projekttyp:</label>
-            <select id="project-type">
-                <option value="">Bitte wählen</option>
-                <option value="podcast">Podcast</option>
-                <option value="video">Video</option>
-            </select>
+        <h2>Teil A: Konzept und Planung (max. 35 Punkte)</h2>
+        
+        <div class="criterion">
+            <label for="crit1">1. Konzeptdokument und Ideenfindung <span class="max-points">(max. 5 Punkte)</span></label>
+            <input type="number" id="crit1" min="0" max="5" step="0.5" value="0">
+            <div class="description">Qualität der Idee, Vollständigkeit der Konzeptbeschreibung, Kreativität</div>
         </div>
-
-        <div class="criteria-section">
-            <h2>Teil A: Inhalt und Struktur <span class="max-points">(max. 35 Punkte)</span></h2>
-            
-            <div class="criterion">
-                <h3>1. Einleitung und Problemstellung (max. 5 Punkte)</h3>
-                <div class="description">
-                    <p>Wird das Thema klar eingeführt und die Relevanz von Gamification deutlich gemacht?</p>
-                    <ul>
-                        <li>Sehr gut (5 Punkte): Klare, prägnante Einleitung mit hervorragender Darstellung der Relevanz</li>
-                        <li>Gut (4 Punkte): Gute Einleitung mit nachvollziehbarer Relevanzdarstellung</li>
-                        <li>Befriedigend (3 Punkte): Akzeptable Einleitung, Relevanz könnte klarer sein</li>
-                        <li>Ausreichend (2 Punkte): Schwache Einleitung, Relevanz kaum erkennbar</li>
-                        <li>Mangelhaft (0-1 Punkt): Keine oder sehr unklare Einleitung</li>
-                    </ul>
-                </div>
-                <div class="input-group">
-                    <label for="points-1a">Erreichte Punkte:</label>
-                    <input type="number" id="points-1a" class="point-input-a" min="0" max="5" value="0">
-                    <span class="max-indicator">/ 5 Punkte</span>
-                </div>
-            </div>
-
-            <div class="criterion">
-                <h3>2. Definitionen und theoretische Grundlagen (max. 10 Punkte)</h3>
-                <div class="description">
-                    <p>Werden die wichtigsten Begriffe und Konzepte klar definiert?</p>
-                    <ul>
-                        <li>Sehr gut (9-10 Punkte): Exzellente, präzise Definitionen mit tiefem Verständnis</li>
-                        <li>Gut (7-8 Punkte): Gute Definitionen, wesentliche Konzepte erfasst</li>
-                        <li>Befriedigend (5-6 Punkte): Grundlegende Definitionen vorhanden, teilweise oberflächlich</li>
-                        <li>Ausreichend (3-4 Punkte): Unvollständige oder ungenaue Definitionen</li>
-                        <li>Mangelhaft (0-2 Punkte): Fehlende oder falsche Definitionen</li>
-                    </ul>
-                </div>
-                <div class="input-group">
-                    <label for="points-2a">Erreichte Punkte:</label>
-                    <input type="number" id="points-2a" class="point-input-a" min="0" max="10" value="0">
-                    <span class="max-indicator">/ 10 Punkte</span>
-                </div>
-            </div>
-
-            <div class="criterion">
-                <h3>3. Praxisbeispiele und Anwendungen (max. 10 Punkte)</h3>
-                <div class="description">
-                    <p>Werden konkrete, relevante Beispiele präsentiert und analysiert?</p>
-                    <ul>
-                        <li>Sehr gut (9-10 Punkte): Mehrere exzellente Beispiele mit fundierter Analyse</li>
-                        <li>Gut (7-8 Punkte): Gute Beispiele mit nachvollziehbarer Analyse</li>
-                        <li>Befriedigend (5-6 Punkte): Grundlegende Beispiele, Analyse könnte tiefer sein</li>
-                        <li>Ausreichend (3-4 Punkte): Wenige oder schwache Beispiele</li>
-                        <li>Mangelhaft (0-2 Punkte): Keine oder irrelevante Beispiele</li>
-                    </ul>
-                </div>
-                <div class="input-group">
-                    <label for="points-3a">Erreichte Punkte:</label>
-                    <input type="number" id="points-3a" class="point-input-a" min="0" max="10" value="0">
-                    <span class="max-indicator">/ 10 Punkte</span>
-                </div>
-            </div>
-
-            <div class="criterion">
-                <h3>4. Kritische Reflexion und Fazit (max. 10 Punkte)</h3>
-                <div class="description">
-                    <p>Werden Vor- und Nachteile kritisch beleuchtet und ein fundiertes Fazit gezogen?</p>
-                    <ul>
-                        <li>Sehr gut (9-10 Punkte): Ausgezeichnete kritische Auseinandersetzung mit differenziertem Fazit</li>
-                        <li>Gut (7-8 Punkte): Gute Reflexion mit nachvollziehbarem Fazit</li>
-                        <li>Befriedigend (5-6 Punkte): Grundlegende Reflexion, Fazit könnte prägnanter sein</li>
-                        <li>Ausreichend (3-4 Punkte): Oberflächliche Reflexion, schwaches Fazit</li>
-                        <li>Mangelhaft (0-2 Punkte): Keine kritische Reflexion oder Fazit fehlt</li>
-                    </ul>
-                </div>
-                <div class="input-group">
-                    <label for="points-4a">Erreichte Punkte:</label>
-                    <input type="number" id="points-4a" class="point-input-a" min="0" max="10" value="0">
-                    <span class="max-indicator">/ 10 Punkte</span>
-                </div>
-            </div>
-
-            <div class="sum-display">
-                <strong>Summe Teil A: <span id="sum-a">0</span> / 35 Punkte</strong>
-            </div>
+        
+        <div class="criterion">
+            <label for="crit2">2. Gamification-Elemente <span class="max-points">(max. 10 Punkte)</span></label>
+            <input type="number" id="crit2" min="0" max="10" step="0.5" value="0">
+            <div class="description">Sinnvoller Einsatz von Gamification-Mechanismen (Punkte, Levels, Badges, etc.)</div>
         </div>
-
-        <div class="criteria-section">
-            <h2>Teil B: Medienspezifische Umsetzung</h2>
-            
-            <div id="podcast-criteria" class="media-specific" style="display: none;">
-                <h3>Podcast-Kriterien (max. 8 Punkte)</h3>
-                
-                <div class="criterion">
-                    <h4>1. Audioqualität (max. 3 Punkte)</h4>
-                    <div class="description">
-                        <ul>
-                            <li>Sehr gut (3 Punkte): Professionelle Aufnahmequalität, keine Störgeräusche</li>
-                            <li>Gut (2 Punkte): Gute Qualität mit minimalen Störungen</li>
-                            <li>Befriedigend (1 Punkt): Akzeptable Qualität, einige Störungen</li>
-                            <li>Mangelhaft (0 Punkte): Schlechte Qualität, viele Störungen</li>
-                        </ul>
-                    </div>
-                    <div class="input-group">
-                        <label for="points-1b-podcast">Erreichte Punkte:</label>
-                        <input type="number" id="points-1b-podcast" class="point-input-b podcast-input" min="0" max="3" value="0">
-                        <span class="max-indicator">/ 3 Punkte</span>
-                    </div>
-                </div>
-
-                <div class="criterion">
-                    <h4>2. Sprechweise und Verständlichkeit (max. 3 Punkte)</h4>
-                    <div class="description">
-                        <ul>
-                            <li>Sehr gut (3 Punkte): Exzellente Artikulation, angenehmes Tempo, sehr verständlich</li>
-                            <li>Gut (2 Punkte): Gute Artikulation und Verständlichkeit</li>
-                            <li>Befriedigend (1 Punkt): Ausreichend verständlich, Tempo könnte besser sein</li>
-                            <li>Mangelhaft (0 Punkte): Schwer verständlich, unangenehmes Tempo</li>
-                        </ul>
-                    </div>
-                    <div class="input-group">
-                        <label for="points-2b-podcast">Erreichte Punkte:</label>
-                        <input type="number" id="points-2b-podcast" class="point-input-b podcast-input" min="0" max="3" value="0">
-                        <span class="max-indicator">/ 3 Punkte</span>
-                    </div>
-                </div>
-
-                <div class="criterion">
-                    <h4>3. Struktur und Dramaturgie (max. 2 Punkte)</h4>
-                    <div class="description">
-                        <ul>
-                            <li>Sehr gut (2 Punkte): Hervorragende Struktur mit klarem Spannungsbogen</li>
-                            <li>Gut (1 Punkt): Erkennbare Struktur</li>
-                            <li>Mangelhaft (0 Punkte): Keine klare Struktur</li>
-                        </ul>
-                    </div>
-                    <div class="input-group">
-                        <label for="points-3b-podcast">Erreichte Punkte:</label>
-                        <input type="number" id="points-3b-podcast" class="point-input-b podcast-input" min="0" max="2" value="0">
-                        <span class="max-indicator">/ 2 Punkte</span>
-                    </div>
-                </div>
-
-                <div class="sum-display">
-                    <strong>Summe Teil B (Podcast): <span id="sum-b-podcast">0</span> / 8 Punkte</strong>
-                </div>
-            </div>
-
-            <div id="video-criteria" class="media-specific" style="display: none;">
-                <h3>Video-Kriterien (max. 10 Punkte)</h3>
-                
-                <div class="criterion">
-                    <h4>1. Bild- und Tonqualität (max. 3 Punkte)</h4>
-                    <div class="description">
-                        <ul>
-                            <li>Sehr gut (3 Punkte): Professionelle Video- und Audioqualität</li>
-                            <li>Gut (2 Punkte): Gute Qualität mit minimalen Mängeln</li>
-                            <li>Befriedigend (1 Punkt): Akzeptable Qualität</li>
-                            <li>Mangelhaft (0 Punkte): Schlechte Qualität</li>
-                        </ul>
-                    </div>
-                    <div class="input-group">
-                        <label for="points-1b-video">Erreichte Punkte:</label>
-                        <input type="number" id="points-1b-video" class="point-input-b video-input" min="0" max="3" value="0">
-                        <span class="max-indicator">/ 3 Punkte</span>
-                    </div>
-                </div>
-
-                <div class="criterion">
-                    <h4>2. Visuelle Gestaltung (max. 4 Punkte)</h4>
-                    <div class="description">
-                        <ul>
-                            <li>Sehr gut (4 Punkte): Exzellente visuelle Elemente, professionelles Design</li>
-                            <li>Gut (3 Punkte): Gute visuelle Gestaltung</li>
-                            <li>Befriedigend (2 Punkte): Grundlegende visuelle Elemente</li>
-                            <li>Ausreichend (1 Punkt): Wenige visuelle Elemente</li>
-                            <li>Mangelhaft (0 Punkte): Keine oder schlechte visuelle Gestaltung</li>
-                        </ul>
-                    </div>
-                    <div class="input-group">
-                        <label for="points-2b-video">Erreichte Punkte:</label>
-                        <input type="number" id="points-2b-video" class="point-input-b video-input" min="0" max="4" value="0">
-                        <span class="max-indicator">/ 4 Punkte</span>
-                    </div>
-                </div>
-
-                <div class="criterion">
-                    <h4>3. Schnitt und Postproduktion (max. 3 Punkte)</h4>
-                    <div class="description">
-                        <ul>
-                            <li>Sehr gut (3 Punkte): Professioneller Schnitt mit gelungenen Übergängen</li>
-                            <li>Gut (2 Punkte): Guter Schnitt, flüssige Übergänge</li>
-                            <li>Befriedigend (1 Punkt): Grundlegender Schnitt</li>
-                            <li>Mangelhaft (0 Punkte): Schlechter oder fehlender Schnitt</li>
-                        </ul>
-                    </div>
-                    <div class="input-group">
-                        <label for="points-3b-video">Erreichte Punkte:</label>
-                        <input type="number" id="points-3b-video" class="point-input-b video-input" min="0" max="3" value="0">
-                        <span class="max-indicator">/ 3 Punkte</span>
-                    </div>
-                </div>
-
-                <div class="sum-display">
-                    <strong>Summe Teil B (Video): <span id="sum-b-video">0</span> / 10 Punkte</strong>
-                </div>
-            </div>
+        
+        <div class="criterion">
+            <label for="crit3">3. User Stories und Anforderungen <span class="max-points">(max. 10 Punkte)</span></label>
+            <input type="number" id="crit3" min="0" max="10" step="0.5" value="0">
+            <div class="description">Vollständigkeit und Qualität der User Stories, klare Anforderungsdefinition</div>
         </div>
-
-        <div class="total-section">
-            <h2>Gesamtbewertung</h2>
-            <div class="total-display">
-                <strong>Gesamtpunktzahl: <span id="total-points">0</span> / <span id="max-total">0</span> Punkte</strong>
-            </div>
-            <div class="grade-display">
-                <strong>Note: <span id="final-grade">-</span></strong>
-            </div>
+        
+        <div class="criterion">
+            <label for="crit4">4. Projektplanung und Organisation <span class="max-points">(max. 10 Punkte)</span></label>
+            <input type="number" id="crit4" min="0" max="10" step="0.5" value="0">
+            <div class="description">Zeitplanung, Meilensteine, Aufgabenverteilung (bei Gruppenarbeiten)</div>
         </div>
-
-        <div class="comments-section">
-            <h3>Kommentare und Feedback:</h3>
-            <textarea id="comments" rows="6" placeholder="Zusätzliche Anmerkungen und Verbesserungsvorschläge..."></textarea>
+        
+        <h2>Teil B: Umsetzung und Dokumentation (max. 30 Punkte)</h2>
+        
+        <div class="criterion">
+            <label for="crit5">5. Technische Umsetzung <span class="max-points">(max. 15 Punkte)</span></label>
+            <input type="number" id="crit5" min="0" max="15" step="0.5" value="0">
+            <div class="description">Funktionalität, Code-Qualität, technische Komplexität</div>
         </div>
-
-        <div class="action-buttons">
-            <button onclick="calculateTotal()">Berechnen</button>
-            <button onclick="resetForm()">Zurücksetzen</button>
-            <button onclick="window.print()">Drucken</button>
+        
+        <div class="criterion">
+            <label for="crit6">6. Design und Benutzerfreundlichkeit <span class="max-points">(max. 10 Punkte)</span></label>
+            <input type="number" id="crit6" min="0" max="10" step="0.5" value="0">
+            <div class="description">UI/UX Design, Intuitivität, visuelle Gestaltung</div>
+        </div>
+        
+        <div class="criterion">
+            <label for="crit7">7. Dokumentation <span class="max-points">(max. 5 Punkte)</span></label>
+            <input type="number" id="crit7" min="0" max="5" step="0.5" value="0">
+            <div class="description">README, Code-Kommentare, Benutzeranleitung</div>
+        </div>
+        
+        <button onclick="calculateResults()">Berechnen</button>
+        
+        <div class="result" id="result" style="display: none;">
+            <h3>Ergebnis</h3>
+            <div class="sum">Teil A: <span id="sum-a">0</span> / 35 Punkte</div>
+            <div class="sum">Teil B: <span id="sum-b">0</span> / 30 Punkte</div>
+            <div class="sum">Gesamt: <span id="sum-total">0</span> / 65 Punkte</div>
+            <div class="grade">Note: <span id="grade">-</span></div>
         </div>
     </div>
-
+    
     <script>
-        // Show/hide criteria based on project type
-        document.getElementById('project-type').addEventListener('change', function() {
-            const projectType = this.value;
-            const podcastCriteria = document.getElementById('podcast-criteria');
-            const videoCriteria = document.getElementById('video-criteria');
+        function calculateResults() {
+            // Teil A (Kriterien 1-4)
+            const crit1 = parseFloat(document.getElementById('crit1').value) || 0;
+            const crit2 = parseFloat(document.getElementById('crit2').value) || 0;
+            const crit3 = parseFloat(document.getElementById('crit3').value) || 0;
+            const crit4 = parseFloat(document.getElementById('crit4').value) || 0;
             
-            if (projectType === 'podcast') {
-                podcastCriteria.style.display = 'block';
-                videoCriteria.style.display = 'none';
-                // Disable video inputs
-                document.querySelectorAll('.video-input').forEach(input => {
-                    input.value = 0;
-                    input.disabled = true;
-                });
-                // Enable podcast inputs
-                document.querySelectorAll('.podcast-input').forEach(input => {
-                    input.disabled = false;
-                });
-            } else if (projectType === 'video') {
-                podcastCriteria.style.display = 'none';
-                videoCriteria.style.display = 'block';
-                // Disable podcast inputs
-                document.querySelectorAll('.podcast-input').forEach(input => {
-                    input.value = 0;
-                    input.disabled = true;
-                });
-                // Enable video inputs
-                document.querySelectorAll('.video-input').forEach(input => {
-                    input.disabled = false;
-                });
-            } else {
-                podcastCriteria.style.display = 'none';
-                videoCriteria.style.display = 'none';
-            }
+            // Teil B (Kriterien 5-7)
+            const crit5 = parseFloat(document.getElementById('crit5').value) || 0;
+            const crit6 = parseFloat(document.getElementById('crit6').value) || 0;
+            const crit7 = parseFloat(document.getElementById('crit7').value) || 0;
             
-            calculateTotal();
-        });
-
-        // Auto-calculate on input change
-        document.querySelectorAll('.point-input-a, .point-input-b').forEach(input => {
-            input.addEventListener('input', calculateTotal);
-        });
-
-        function calculateTotal() {
-            // Calculate Teil A
-            let sumA = 0;
-            document.querySelectorAll('.point-input-a').forEach(input => {
-                sumA += parseFloat(input.value) || 0;
-            });
-            document.getElementById('sum-a').textContent = sumA;
-
-            // Calculate Teil B based on project type
-            const projectType = document.getElementById('project-type').value;
-            let sumB = 0;
-            let maxTotal = 0;
-
-            if (projectType === 'podcast') {
-                document.querySelectorAll('.podcast-input').forEach(input => {
-                    sumB += parseFloat(input.value) || 0;
-                });
-                document.getElementById('sum-b-podcast').textContent = sumB;
-                maxTotal = 43; // 35 + 8
-            } else if (projectType === 'video') {
-                document.querySelectorAll('.video-input').forEach(input => {
-                    sumB += parseFloat(input.value) || 0;
-                });
-                document.getElementById('sum-b-video').textContent = sumB;
-                maxTotal = 45; // 35 + 10
-            }
-
-            // Calculate total
-            const totalPoints = sumA + sumB;
-            document.getElementById('total-points').textContent = totalPoints;
-            document.getElementById('max-total').textContent = maxTotal;
-
-            // Calculate grade if project type is selected
-            if (projectType && maxTotal > 0) {
-                const percentage = (totalPoints / maxTotal) * 100;
-                let grade;
-                
-                if (percentage >= 90) grade = '1.0';
-                else if (percentage >= 85) grade = '1.3';
-                else if (percentage >= 80) grade = '1.7';
-                else if (percentage >= 75) grade = '2.0';
-                else if (percentage >= 70) grade = '2.3';
-                else if (percentage >= 65) grade = '2.7';
-                else if (percentage >= 60) grade = '3.0';
-                else if (percentage >= 55) grade = '3.3';
-                else if (percentage >= 50) grade = '3.7';
-                else if (percentage >= 45) grade = '4.0';
-                else grade = '5.0';
-                
-                document.getElementById('final-grade').textContent = grade;
-            } else {
-                document.getElementById('final-grade').textContent = '-';
-            }
+            const sumA = crit1 + crit2 + crit3 + crit4;
+            const sumB = crit5 + crit6 + crit7;
+            const total = sumA + sumB;
+            
+            // Maximalpunkte für Prozentberechnung
+            const maxPointsB = 30;
+            const maxPoints = 35 + maxPointsB;
+            
+            // Prozentwert berechnen
+            const percentage = (total / maxPoints) * 100;
+            
+            // Note nach Schweizer Notensystem (6 = beste Note, 1 = schlechteste)
+            let grade;
+            if (percentage >= 96) grade = 6.0;
+            else if (percentage >= 91) grade = 5.5;
+            else if (percentage >= 86) grade = 5.0;
+            else if (percentage >= 81) grade = 4.5;
+            else if (percentage >= 76) grade = 4.0;
+            else if (percentage >= 71) grade = 3.5;
+            else if (percentage >= 66) grade = 3.0;
+            else if (percentage >= 61) grade = 2.5;
+            else if (percentage >= 56) grade = 2.0;
+            else if (percentage >= 51) grade = 1.5;
+            else grade = 1.0;
+            
+            // Ergebnisse anzeigen
+            document.getElementById('sum-a').textContent = sumA.toFixed(1);
+            document.getElementById('sum-b').textContent = sumB.toFixed(1);
+            document.getElementById('sum-total').textContent = total.toFixed(1);
+            document.getElementById('grade').textContent = grade.toFixed(1);
+            document.getElementById('result').style.display = 'block';
         }
-
-        function resetForm() {
-            if (confirm('Möchten Sie wirklich alle Eingaben zurücksetzen?')) {
-                document.getElementById('student-name').value = '';
-                document.getElementById('project-type').value = '';
-                document.getElementById('comments').value = '';
-                
-                document.querySelectorAll('.point-input-a, .point-input-b').forEach(input => {
-                    input.value = 0;
-                    input.disabled = false;
-                });
-                
-                document.getElementById('podcast-criteria').style.display = 'none';
-                document.getElementById('video-criteria').style.display = 'none';
-                
-                calculateTotal();
-            }
-        }
-
-        // Initial calculation
-        calculateTotal();
     </script>
 </body>
 </html>
