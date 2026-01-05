@@ -199,42 +199,48 @@
             }
             h1, h2, h3 {
                 page-break-after: avoid;
-                margin-top: 8px; /* Stark reduzierte Abstände */
-                margin-bottom:  2px;
-                padding-bottom: 2px;
+                margin-top: 6px; /* Stark reduzierte Abstände */
+                margin-bottom:  1px;
+                padding-bottom: 1px;
             }
-            h1 { font-size: 14pt; }
-            h3 { font-size: 10pt; }
+            h1 { font-size: 13pt; }
+            h3 { font-size: 9pt; }
 
             table {
-                margin-top: 5px;
+                margin-top: 3px;
             }
             th, td {
-                padding: 3px; /* Stark reduzierter Zellenabstand */
+                padding: 2px; /* Stark reduzierter Zellenabstand */
+                font-size: 0.9em;
             }
             .criteria-description {
-                font-size: 0.9em;
-                line-height: 1.1;
+                font-size: 0.85em;
+                line-height: 1.05;
             }
             .summary-table td {
-                padding: 4px;
+                padding: 3px;
             }
-            . student-info {
-                margin-bottom: 10px;
+            .student-info {
+                margin-bottom: 8px;
             }
             textarea {
-                height: 40px ! important; /* Sehr kleine Höhe für Feedbackfelder */
+                height: 30px !important; /* Sehr kleine Höhe */
+                min-height: 30px !important;
+            }
+            #teacher-comments {
+                height: 25px !important;
+                min-height: 25px !important;
             }
             .feedback-section {
-                margin-top: 10px;
+                margin-top: 8px;
             }
             .signature-section {
-                margin-top: 15px;
+                margin-top: 10px;
             }
-            . signature-line {
-                margin-top: 15px; /* Geringerer Abstand für Unterschrift */
+            .signature-line {
+                margin-top: 10px; /* Geringerer Abstand für Unterschrift */
             }
-            table, . feedback-section {
+            table, .feedback-section {
                 page-break-inside: avoid; /* Seitenumbrüche in Tabellen verhindern */
             }
         }
@@ -382,9 +388,9 @@
         </tbody>
     </table>
 
-    <div style="margin-top: 30px; margin-bottom: 30px;">
+    <div style="margin-top: 20px; margin-bottom: 20px;">
         <h3>Anmerkungen der Lehrkraft</h3>
-        <textarea placeholder="Hier können Sie Ihre Anmerkungen zur Beurteilung festhalten..." style="width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 1em;"></textarea>
+        <textarea id="teacher-comments" placeholder="Hier können Sie Ihre Anmerkungen zur Beurteilung festhalten..." style="width: 100%; min-height: 60px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 1em;"></textarea>
     </div>
 
     <h3>Gesamtergebnis</h3>
