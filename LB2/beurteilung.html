@@ -64,11 +64,6 @@
             text-align: center;
             font-weight: bold;
         }
-        input[type="number"]:disabled {
-            background-color: #e9ecef;
-            color: #28a745;
-            font-weight: bold;
-        }
         .student-info {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -81,49 +76,41 @@
             margin-bottom: 5px;
         }
         .format-selection {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 10px 15px;
             background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border-left: 4px solid #005A9C;
+            border-radius: 5px;
+            border-left: 3px solid #005A9C;
         }
-        .format-selection h3 {
-            margin-top: 0;
-            border-bottom: none;
-            padding-bottom: 0;
+        .format-selection label {
+            font-weight: bold;
+            margin: 0;
         }
         .radio-group {
             display: flex;
-            gap: 30px;
-            margin-top: 15px;
+            gap: 20px;
         }
         .radio-option {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         .radio-option input[type="radio"] {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
         }
         .radio-option label {
-            font-size: 1.1em;
+            font-size: 1em;
             cursor: pointer;
             margin: 0;
+            font-weight: normal;
         }
-        .auto-filled-row {
-            background-color: #d4edda !important;
-            transition: background-color 0.3s ease;
-        }
-        .auto-filled-row td {
-            position: relative;
-        }
-        .auto-filled-row td:first-child::before {
-            content: "✓ ";
-            color: #28a745;
-            font-weight: bold;
-            margin-right: 5px;
+        .hidden-row {
+            display: none;
         }
         .summary-table {
             margin-top: 40px;
@@ -253,11 +240,11 @@
                 page-break-inside: avoid;
             }
             .format-selection {
-                margin-bottom: 10px;
+                margin-bottom: 8px;
+                padding: 5px 10px;
             }
-            .auto-filled-row {
-                -webkit-print-color-adjust: exact;
-                color-adjust: exact;
+            .hidden-row {
+                display: none !important;
             }
         }
     </style>
@@ -283,7 +270,7 @@
     </div>
 
     <div class="format-selection">
-        <h3>Eingereichte Format:</h3>
+        <label>Eingereichte Format:</label>
         <div class="radio-group">
             <div class="radio-option">
                 <input type="radio" id="format-video" name="format" value="video" onchange="handleFormatChange()" checked>
@@ -349,7 +336,7 @@
         </tbody>
     </table>
 
-    <h3>Teil B: Podcast / Video (max. 10 Punkte)</h3>
+    <h3 id="part-b-title">Teil B: Podcast / Video (max. 10 Punkte)</h3>
     <table>
         <thead>
             <tr>
@@ -379,18 +366,18 @@
                     Kein störendes Rauschen, Hall oder Hintergrundgeräusche. Aufnahme ist professionell und ohne technische Mängel.
                 </td>
             </tr>
-            <tr id="video-quality-row">
-                <td><b>7. Videoqualität</b> <span style="font-size: 0.9em; color: #6c757d;">(nur bei Video)</span></td>
+            <tr id="video-quality-row" class="video-only-row">
+                <td><b>7. Videoqualität</b></td>
                 <td class="max-points-cell">2</td>
                 <td class="points-cell"><input id="video-quality-input" class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
             </tr>
-            <tr>
+            <tr id="video-quality-desc-row" class="video-only-row">
                 <td colspan="3" class="criteria-description">
-                    Bildqualität ist ausreichend scharf und gut belichtet. Bildausschnitt ist angemessen gewählt. (Bei Podcast: automatisch 2 Punkte)
+                    Bildqualität ist ausreichend scharf und gut belichtet. Bildausschnitt ist angemessen gewählt.
                 </td>
             </tr>
             <tr>
-                <td><b>8. Inhaltliche Umsetzung</b></td>
+                <td><b><span id="criterion-number-8">8</span>. Inhaltliche Umsetzung</b></td>
                 <td class="max-points-cell">2</td>
                 <td class="points-cell"><input class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
             </tr>
@@ -400,7 +387,7 @@
                 </td>
             </tr>
             <tr>
-                <td><b>9. Sprechweise & Engagement</b></td>
+                <td><b><span id="criterion-number-9">9</span>. Sprechweise & Engagement</b></td>
                 <td class="max-points-cell">2</td>
                 <td class="points-cell"><input class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
             </tr>
@@ -462,19 +449,31 @@
 <script>
     function handleFormatChange() {
         const videoQualityInput = document.getElementById('video-quality-input');
-        const videoQualityRow = document.getElementById('video-quality-row');
+        const videoOnlyRows = document.querySelectorAll('.video-only-row');
         const isPodcast = document.getElementById('format-podcast').checked;
+        const partBTitle = document.getElementById('part-b-title');
+        const sumBDisplay = document.getElementById('sum-b');
+        const criterionNumber8 = document.getElementById('criterion-number-8');
+        const criterionNumber9 = document.getElementById('criterion-number-9');
         
         if (isPodcast) {
-            // Bei Podcast: automatisch 2 Punkte und Feld deaktivieren
-            videoQualityInput.value = 2;
-            videoQualityInput.disabled = true;
-            videoQualityRow.classList.add('auto-filled-row');
+            // Bei Podcast: Videoqualität-Zeilen ausblenden
+            videoOnlyRows.forEach(row => {
+                row.classList.add('hidden-row');
+            });
+            videoQualityInput.value = 0; // Wert auf 0 setzen
+            partBTitle.textContent = 'Teil B: Podcast (max. 8 Punkte)';
+            criterionNumber8.textContent = '7';
+            criterionNumber9.textContent = '8';
         } else {
-            // Bei Video: Feld aktivieren und zurücksetzen
+            // Bei Video: Videoqualität-Zeilen anzeigen
+            videoOnlyRows.forEach(row => {
+                row.classList.remove('hidden-row');
+            });
             videoQualityInput.value = '';
-            videoQualityInput.disabled = false;
-            videoQualityRow.classList.remove('auto-filled-row');
+            partBTitle.textContent = 'Teil B: Video (max. 10 Punkte)';
+            criterionNumber8.textContent = '8';
+            criterionNumber9.textContent = '9';
         }
         
         calculateResults();
@@ -490,17 +489,23 @@
 
         let sumB = 0;
         document.querySelectorAll('.point-input-b').forEach(input => {
-            const max = parseInt(input.max);
-            if (parseInt(input.value) > max) input.value = max;
-            sumB += Number(input.value) || 0;
+            // Nur zählen wenn das Feld nicht in einer versteckten Zeile ist
+            const row = input.closest('tr');
+            if (!row || !row.classList.contains('hidden-row')) {
+                const max = parseInt(input.max);
+                if (parseInt(input.value) > max) input.value = max;
+                sumB += Number(input.value) || 0;
+            }
         });
 
+        const isPodcast = document.getElementById('format-podcast').checked;
+        const maxPointsB = isPodcast ? 8 : 10;
         const totalPoints = sumA + sumB;
-        const maxPoints = 80;
+        const maxPoints = 70 + maxPointsB;
         const percentage = (totalPoints / maxPoints) * 100;
 
         document.getElementById('sum-a').innerText = `${sumA} / 70 Punkte`;
-        document.getElementById('sum-b').innerText = `${sumB} / 10 Punkte`;
+        document.getElementById('sum-b').innerText = `${sumB} / ${maxPointsB} Punkte`;
         document.getElementById('total-points').innerHTML = `<b>${totalPoints} / ${maxPoints} Punkte</b>`;
         document.getElementById('percentage').innerText = `${percentage.toFixed(1)} %`;
         document.getElementById('final-grade').innerHTML = `<b>${getGrade(percentage)}</b>`;
