@@ -210,7 +210,7 @@
 <body>
 
 <div class="container">
-    <h1>Beurteilungsbogen: Spieletest „Pixel-Probe“</h1>
+    <h1>Beurteilungsbogen: Spieletest „Pixel-Probe"</h1>
 
     <div class="student-info">
         <div class="info-item">
@@ -244,7 +244,7 @@
             </tr>
             <tr>
                 <td colspan="3" class="criteria-description">
-                    Alle geforderten Abschnitte (a-e) sind vorhanden und klar erkennbar. Der Text ist sauber strukturiert und sprachlich angemessen für das gewählte Format. Alle Dokumente oder Dateien wurden fristgerecht eingereicht.
+                    Alle geforderten Abschnitte (a-e) sind vorhanden und klar erkennbar. Der Text ist sauber strukturiert und sprachlich angemessen für das gewählte Format. Alle Dokumente oder Datei[...]
                 </td>
             </tr>
             <tr>
@@ -280,7 +280,7 @@
         </tbody>
     </table>
 
-    <h3>Teil B: Präsentation (max. 30 Punkte)</h3>
+    <h3>Teil B: Podcast / Video (max. 10 Punkte)</h3>
     <table>
         <thead>
             <tr>
@@ -291,23 +291,53 @@
         </thead>
         <tbody>
             <tr>
-                <td><b>5. Inhalt & Struktur der Präsentation</b></td>
-                <td class="max-points-cell">15</td>
-                <td class="points-cell"><input class="point-input-b" type="number" min="0" max="15" oninput="calculateResults()"></td>
+                <td><b>5. Audioqualität - Stimme</b></td>
+                <td class="max-points-cell">2</td>
+                <td class="points-cell"><input class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
             </tr>
             <tr>
                 <td colspan="3" class="criteria-description">
-                    Die Präsentation fasst die wichtigsten Ergebnisse prägnant zusammen. Das Urteil ist klar. Der Zeitrahmen (3-5 Min.) wird eingehalten.
+                    Die Stimme ist klar und deutlich verständlich. Lautstärke ist angemessen und konstant.
                 </td>
             </tr>
             <tr>
-                <td><b>6. Vortragsweise & technische Umsetzung</b></td>
-                <td class="max-points-cell">15</td>
-                <td class="points-cell"><input class="point-input-b" type="number" min="0" max="15" oninput="calculateResults()"></td>
+                <td><b>6. Audioqualität - Hintergrund</b></td>
+                <td class="max-points-cell">2</td>
+                <td class="points-cell"><input class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
             </tr>
             <tr>
                 <td colspan="3" class="criteria-description">
-                    Der Vortrag ist flüssig und verständlich. Die technische Qualität von Bild/Ton ist ausreichend.
+                    Kein störendes Rauschen, Hall oder Hintergrundgeräusche. Aufnahme ist professionell und ohne technische Mängel.
+                </td>
+            </tr>
+            <tr>
+                <td><b>7. Videoqualität (falls Video)</b></td>
+                <td class="max-points-cell">2</td>
+                <td class="points-cell"><input class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
+            </tr>
+            <tr>
+                <td colspan="3" class="criteria-description">
+                    Bildqualität ist ausreichend scharf und gut belichtet. Bildausschnitt ist angemessen gewählt. (Bei reinem Podcast: volle Punktzahl)
+                </td>
+            </tr>
+            <tr>
+                <td><b>8. Inhaltliche Umsetzung</b></td>
+                <td class="max-points-cell">2</td>
+                <td class="points-cell"><input class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
+            </tr>
+            <tr>
+                <td colspan="3" class="criteria-description">
+                    Die wichtigsten Erkenntnisse werden zusammengefasst. Die Bewertung des Spiels wird klar kommuniziert.
+                </td>
+            </tr>
+            <tr>
+                <td><b>9. Sprechweise & Engagement</b></td>
+                <td class="max-points-cell">2</td>
+                <td class="points-cell"><input class="point-input-b" type="number" min="0" max="2" oninput="calculateResults()"></td>
+            </tr>
+            <tr>
+                <td colspan="3" class="criteria-description">
+                    Der Vortrag ist flüssig und lebendig. Die Sprechweise ist motiviert und ansprechend für Zuhörer/Zuschauer.
                 </td>
             </tr>
         </tbody>
@@ -322,11 +352,11 @@
             </tr>
             <tr>
                 <td>Zwischensumme Teil B</td>
-                <td id="sum-b">0 / 30 Punkte</td>
+                <td id="sum-b">0 / 10 Punkte</td>
             </tr>
             <tr>
                 <td><b>Gesamtpunktzahl</b></td>
-                <td id="total-points"><b>0 / 100 Punkte</b></td>
+                <td id="total-points"><b>0 / 80 Punkte</b></td>
             </tr>
             <tr>
                 <td>Prozent</td>
@@ -349,7 +379,7 @@
     <div class="signature-section">
         <div class="signature-item">
             <label>Datum:</label>
-            <div class="signature-line"></div>
+            <input type="text" id="date-field" readonly style="border: none; background: transparent; padding: 0; margin-top: 10px;">
         </div>
         <div class="signature-item">
             <label>Unterschrift:</label>
@@ -377,11 +407,12 @@
         });
 
         const totalPoints = sumA + sumB;
-        const percentage = totalPoints;
+        const maxPoints = 80;
+        const percentage = (totalPoints / maxPoints) * 100;
 
         document.getElementById('sum-a').innerText = `${sumA} / 70 Punkte`;
-        document.getElementById('sum-b').innerText = `${sumB} / 30 Punkte`;
-        document.getElementById('total-points').innerHTML = `<b>${totalPoints} / 100 Punkte</b>`;
+        document.getElementById('sum-b').innerText = `${sumB} / 10 Punkte`;
+        document.getElementById('total-points').innerHTML = `<b>${totalPoints} / ${maxPoints} Punkte</b>`;
         document.getElementById('percentage').innerText = `${percentage.toFixed(1)} %`;
         document.getElementById('final-grade').innerHTML = `<b>${getGrade(percentage)}</b>`;
     }
@@ -395,9 +426,19 @@
         return "6 (Ungenügend)";
     }
 
-    window.onload = calculateResults;
+    function setCurrentDate() {
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const year = today.getFullYear();
+        document.getElementById('date-field').value = `${day}.${month}.${year}`;
+    }
+
+    window.onload = function() {
+        calculateResults();
+        setCurrentDate();
+    };
 </script>
 
 </body>
 </html>
-
